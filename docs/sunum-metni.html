@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sunum ve Sahne Metni · APP Fraud Case</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1d1d1f; margin: 0; }
+  h1 { font-size: 24pt; margin: 0 0 4pt; color: #c8213a; }
+  h2 { font-size: 15pt; margin: 18pt 0 6pt; color: #c8213a; border-bottom: 1.5pt solid #f0c9cf; padding-bottom: 3pt; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 12pt 0 4pt; page-break-after: avoid; }
+  p { margin: 0 0 6pt; }
+  .sub { color: #555; font-size: 11pt; }
+  .cover { padding-top: 30mm; page-break-after: always; }
+  .cover .meta { margin-top: 18pt; font-size: 10.5pt; color: #444; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9.8pt; page-break-inside: auto; }
+  th, td { border: 0.6pt solid #d6d6d6; padding: 4pt 6pt; vertical-align: top; text-align: left; }
+  th { background: #fbeef0; }
+  tr { page-break-inside: avoid; }
+  .who { display: inline-block; font-weight: 700; color: #fff; background: #c8213a; border-radius: 3pt; padding: 0 5pt; font-size: 9pt; margin-right: 4pt; }
+  .who.k2 { background: #7a4b9a; } .who.k3 { background: #2f6f9f; } .who.k4 { background: #2e7d4f; } .who.k5 { background: #9a6a12; } .who.all { background: #555; }
+  .line { margin: 0 0 5pt; padding-left: 0; page-break-inside: avoid; }
+  .act { background: #f2f2f4; border-left: 3pt solid #999; padding: 3pt 7pt; margin: 4pt 0 6pt; font-size: 9.6pt; page-break-inside: avoid; }
+  .act b { color: #333; }
+  .say { border-left: 3pt solid #c8213a; padding: 2pt 8pt; margin: 4pt 0 8pt; page-break-inside: avoid; }
+  .key { background: #fff7e0; border: 0.6pt solid #e8c76a; border-radius: 4pt; padding: 6pt 9pt; margin: 6pt 0 10pt; page-break-inside: avoid; }
+  .slide { page-break-inside: avoid; margin-bottom: 8pt; }
+  .slide h3 { display: flex; justify-content: space-between; }
+  .slide h3 small { font-weight: 400; color: #777; }
+  code { font-family: Consolas, monospace; font-size: 9.3pt; background: #f2f2f4; padding: 0 3pt; }
+  ul { margin: 2pt 0 6pt 16pt; padding: 0; } li { margin: 1pt 0; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>“Maliye’den Arıyorum”</h1>
+  <p class="sub">APP Fraud Case · Sahne + Sunum Konuşma Metni ve Görev Dağılımı</p>
+  <p class="sub">Akbank Case Maratonu · 17 Ekim 2026</p>
+  <div class="meta">
+    <p><b>Toplam süre:</b> yaklaşık 19–20 dakika (uygulamada sahne 1 + sahne 2 + SRE: yaklaşık 6 dk · sunum: yaklaşık 13 dk). Süre sınırı farklıysa “Kısaltma” notlarına bakın.</p>
+    <p><b>İki sekme açık olacak:</b></p>
+    <ul>
+      <li>Sekme A, uygulama: <code>phone-demo/index.html?mod=korumasiz</code> (Karabanka ile başlar)</li>
+      <li>Sekme B, sunum: <code>presentation/index.html</code> (j/k ile bölüm, ok tuşlarıyla adım)</li>
+    </ul>
+    <p><b>Jüri kriterleri ve karşılığı:</b> Sunum ve ekip çalışması → beş kişi, net roller · Yaratıcılık → canlı iki sahne · Önleyici kontrol önerisi → bölüm 11 · Teknik analiz → bölüm 06–10 · Finansal zarar analizi → bölüm 16.</p>
+    <p><b>Kural:</b> Tüm kişi, kurum ve hesaplar kurgusaldır. Karabanka hayalî bir bankadır. Akbank ekranı konsept demodur; gerçek hesap, para veya telefon erişimi yoktur.</p>
+  </div>
+</div>
+
+<h2>1. Görev dağılımı</h2>
+<table>
+  <tr><th style="width:15%">Kişi</th><th style="width:25%">Sahnedeki rol</th><th style="width:30%">Sunumda anlattığı bölümler</th><th>Hazırlık sorumluluğu</th></tr>
+  <tr><td><span class="who">K1</span> Sunucu</td><td>Sahneler arası geçiş, jüriye anlatım</td><td>00–05: açılış, vaka, 6 taktik, saldırı zinciri, katır hesap, çözüm · 16: kapanış</td><td>Süre takibi, provayı yönetir</td></tr>
+  <tr><td><span class="who k2">K2</span> Kurban</td><td>Telefonu hoparlörde, uygulamayı kullanır</td><td>06: risk skoru ve parametreler (uygulamadaki tıklamaları zaten yaşadı)</td><td>Telefon şarjı ve ses, uygulama tıklama provası</td></tr>
+  <tr><td><span class="who k3">K3</span> Arayan</td><td>Salon dışından “Maliye’den Kemal Aydın”</td><td>07–09: üç seviye, seviyeler birlikte, veri seti</td><td>Sessiz ortam, ses kaydı yedeği</td></tr>
+  <tr><td><span class="who k4">K4</span> Banka</td><td>Sahne 2 sonunda “Akbank Güvenlik Hattı, ben Elif”</td><td>10–11: teknik analiz, önleyici kontroller</td><td>Kendi telefonu hazır, soru-cevap teknik kısmı</td></tr>
+  <tr><td><span class="who k5">K5</span> Operatör</td><td>Bilgisayar: mod değiştirir, arama ekranını açar, SRE panelini yönetir</td><td>Sahne 2’de mod değişimi ve SRE paneli anlatımı · 12–15: vaka yaşanırsa, kök neden, kazanım, finansal zarar</td><td>İki sekme, internet, yedek ekran görüntüleri</td></tr>
+</table>
+<p class="sub">K3 iki sahne boyunca salon dışındadır; SRE paneli anlatılırken salona döner, 07–09’u anlatır.</p>
+
+<h2>2. Hazırlık kontrol listesi (15 dk önce)</h2>
+<ul>
+  <li>Sekme A açık ve yansıtılıyor: <code>?mod=korumasiz</code> → siyah <b>Karabanka</b> giriş ekranı. Sağ paneller gizli, telefon ortada.</li>
+  <li>Sekme B (sunum) açık, Kapak bölümünde. Fontlar için internet açık.</li>
+  <li>Bakiye 100.000 TL, alıcı listesinde “Kalkınma Fonu Tahsilat” var. Değilse uygulamada <b>Sıfırla</b>.</li>
+  <li>K2 ve K4’ün telefonu: sessiz mod kapalı, ses sonuna kadar, rahatsız etme kapalı, şarj %50 üstü.</li>
+  <li>K3 dışarıda, şebeke çekiyor. İşaret: K1, K3’e WhatsApp’tan “HAZIR” yazar.</li>
+  <li>Yedek: sahne 1 konuşmasının ses kaydı bilgisayarda.</li>
+</ul>
+
+<h2>3. Akış ve süre</h2>
+<table>
+  <tr><th style="width:12%">Süre</th><th style="width:20%">Ekran</th><th>Ne oluyor</th><th style="width:16%">Kim</th></tr>
+  <tr><td>0:00–1:40</td><td>Sekme A · Karabanka</td><td>Sahne 1: kurban dolandırılır, 85.000 TL gider</td><td>K2, K3, K5</td></tr>
+  <tr><td>1:40–2:00</td><td>Sekme A</td><td>“Doksan saniye” cümlesi, Sahne 2’ye geçiş</td><td>K1</td></tr>
+  <tr><td>2:00–5:00</td><td>Sekme A · Akbank</td><td>Sahne 2: sinyaller düşer, PARA GÖNDERİLMEDİ, Bankamı ara</td><td>Herkes</td></tr>
+  <tr><td>5:00–6:15</td><td>Sekme A · SRE paneli</td><td>Saldırı simüle et, alarm, katır hesap</td><td>K5</td></tr>
+  <tr><td>6:15–9:30</td><td>Sekme B · 00–05</td><td>Vaka, 6 taktik, saldırı zinciri, katır hesap, çözüm</td><td>K1</td></tr>
+  <tr><td>9:30–11:00</td><td>Sekme B · 06</td><td>Parametreler ve risk skoru hesabı</td><td>K2</td></tr>
+  <tr><td>11:00–13:30</td><td>Sekme B · 07–09</td><td>Üç seviye, karar tablosu, veri seti</td><td>K3</td></tr>
+  <tr><td>13:30–15:30</td><td>Sekme B · 10–11</td><td>Teknik analiz, önleyici kontroller</td><td>K4</td></tr>
+  <tr><td>15:30–19:30</td><td>Sekme B · 12–16</td><td>Vaka sonrası, kök neden, kazanım, finansal zarar, kapanış</td><td>K5, K1</td></tr>
+</table>
+
+<h2 class="pb">4. Açılış: Sahne 1, korumasız Karabanka (Sekme A)</h2>
+<div class="act"><b>Ekran:</b> Karabanka giriş ekranı (siyah), telefon ortada. Jüri yerleşti, sunum başlamadı. K1 “Hazırız, başlayabilir miyiz?” der ve K3’e “HAZIR” yazar. K3 arar.</div>
+<div class="act"><b>K5:</b> uygulamada <b>📞 Gelen arama</b>’ya basar. Jüri projeksiyonda “Bilinmeyen Numara · kendini Maliye’den biri olarak tanıtıyor” ekranını görür. K2 gerçek telefonu açınca K5 <b>Kabul et</b>’e basar.</div>
+<p class="line"><span class="who k2">K2</span>(jüriye mahcup) Pardon, bir saniye… bilmediğim bir numara. (açar, hoparlöre alır) Alo?</p>
+<p class="line"><span class="who k3">K3</span>İyi günler, [K2’nin adı] Bey/Hanım ile mi görüşüyorum? Ben Hazine ve Maliye Bakanlığı Mükellef Hizmetleri biriminden Kemal Aydın. Görüşmemiz kalite standartları gereği kayıt altındadır, sicil numaram 44821.</p>
+<p class="line"><span class="who k3">K3</span>Kayıtlarımızda adınıza 2024 yılından kalan 12.400 lira vergi iadesi görünüyor. Bu yıl yönetmelik değişti; kullanılmayan iadeler Hazine destekli Kalkınma Fonu’na aktarılıyor. Fona katılırsanız iadeniz üç ayda yüzde kırk getiriyle size dönüyor. Katılmazsanız iade Hazine’ye gelir olarak kaydediliyor.</p>
+<p class="line"><span class="who k2">K2</span>Yüzde kırk mı? Bu devletin fonu mu yani?</p>
+<p class="line"><span class="who k3">K3</span>Evet, tamamen devlet güvencesinde, ana paranız garanti. Yalnız bu dönemin kontenjanı bugün saat 17:00’de kapanıyor. Katılım için birikiminizin de fona yatırılması gerekiyor. Mobil bankacılığınıza girebilir misiniz? Adım adım yönlendireceğim.</p>
+<div class="act"><b>K2 (uygulamada):</b> Face ID düğmesine dokunur → giriş → <b>Para gönder</b>.</div>
+<p class="line"><span class="who k3">K3</span>Alıcı olarak “Kalkınma Fonu Tahsilat”ı seçin, bakanlığın tahsilat hesabıdır. Hesabınızda ne kadar var? … O zaman seksen beş bin yazın, on beş bin hesabınızda kalsın.</p>
+<div class="act"><b>K2:</b> Alıcı = Kalkınma Fonu Tahsilat · tutar çipi <b>85.000</b> (ekranda “Bakiyenin %85’i · Normal tutarın 17 katı”).</div>
+<p class="line"><span class="who k2">K2</span>(duraksar) Seksen beş… bu biraz fazla değil mi?</p>
+<p class="line"><span class="who k3">K3</span>Tedirgin olmanız çok normal. Devlet güvencesinde, bugün kaçırırsanız bir dahaki dönem yok. Bir de açıklamaya “yakınıma destek” yazın. Bankanız sorarsa da öyle söyleyin; bankalar bu fonu sevmiyor, işlemi yavaşlatıyorlar.</p>
+<div class="act"><b>K2:</b> Açıklama = “yakınıma destek” → <b>Gönder</b> → “İşlem başarılı. 85.000,00 TL gönderildi.” Ana sayfada bakiye 100.000’den 15.000’e iner.</div>
+<p class="line"><span class="who k2">K2</span>Tamam, gönderdim. Başarılı yazıyor.</p>
+<p class="line"><span class="who k3">K3</span>Çok teşekkür ederim, dosyanız tamamlandı. Dekontunuz üç iş günü içinde e-Devlet’e düşecek. Hayırlı günler. (kapatır)</p>
+<div class="act"><b>K5:</b> <b>📞 Aramayı bitir</b>. Üç saniye sessizlik.</div>
+<div class="say"><span class="who">K1</span> Seksen beş bin lira. Doksan saniye. Arkadaşımız bu parayı kendi telefonundan, kendi şifresiyle, kendi onayıyla gönderdi. Bankanın sistemine göre tamamen meşru bir işlemdi: doğru cihaz, doğru şifre, doğru müşteri. Az önce izlediğiniz bir canlandırmaydı, ama bu senaryo Türkiye’de her gün yaşanıyor. Buna yetkili itme ödemesi dolandırıcılığı, yani APP fraud diyoruz. Şimdi aynı aramayı, aynı kurbanla, bu sefer Akbank’ın korumalı uygulamasıyla tekrar yaşayalım.</div>
+<div class="act"><b>K5:</b> Aynı sekmede kalır. K3 dışarıda bekler, Sahne 2’ye geçilir.</div>
+
+<h2 class="pb">5. Sahne 2: korumalı Akbank + SRE paneli (Sekme A, hemen ardından)</h2>
+<div class="act"><b>K5:</b> Aynı sekmede üstte <b>🛡 Korumalı · Sahne 2</b>’ye basar. Ekran kırmızı <b>Akbank</b> olur; telefonun yanında risk motoru (puan 0, “Düşük risk”) ve en sağda SRE paneli açılır. K1, K3’e tekrar “HAZIR” yazar.</div>
+<div class="say"><span class="who">K1</span> Başta izlediğiniz aramayı hatırlıyorsunuz. Şimdi aynı aramayı bu sefer bizim çözümümüzle tekrar yaşayalım. Ekranın ortasına dikkat: risk puanı.</div>
+<div class="act"><b>K5:</b> <b>📞 Gelen arama</b> → K2 telefonu açınca <b>Kabul et</b>.</div>
+<p class="line"><span class="who k3">K3</span>İyi günler, Hazine ve Maliye Bakanlığı’ndan Kemal Aydın. Az önce görüşmüştük, sistemde bir eksik kalmış, işlemi tekrar yapmamız gerekiyor. Mobil bankacılığınızı açar mısınız?</p>
+<div class="act"><b>K2:</b> Face ID ile giriş → risk panelinde “Arama süreci aktif +25” kayarak düşer.</div>
+<div class="say"><span class="who">K1</span> (alçak sesle) İlk sinyal: müşteri aktif bir görüşme sırasında bankacılık uygulamasını açtı. Tek başına suç değil, not alıyoruz.</div>
+<p class="line"><span class="who k3">K3</span>“Para gönder”e girin, alıcı yine “Kalkınma Fonu Tahsilat”.</p>
+<div class="act"><b>K2:</b> Para gönder → alıcı seçer → “Yeni alıcı +30”, puan 55, “Orta risk”.</div>
+<div class="say"><span class="who">K1</span> İkinci sinyal: bu alıcıya daha önce hiç para gönderilmemiş.</div>
+<p class="line"><span class="who k3">K3</span>Tutar seksen beş bin.</p>
+<div class="act"><b>K2:</b> <b>85.000</b> → “Yüksek tutar +25 · bakiyenin %85’i · normal tutarın 17 katı”, puan 80, gösterge kırmızıya döner ve nabız atar.</div>
+<div class="say"><span class="who">K1</span> Üçüncü sinyal: bakiyenin neredeyse tamamı, normal havalesinin on yedi katı. Sinyaller tek tek masum; birlikte bakınca tablo değişiyor.</div>
+<div class="act"><b>K2:</b> Açıklama “yakınıma destek” → <b>Gönder</b> → “Güvenli An kontrol ediyor…” Bu sırada sağda risk motorunun yedi adımı sırayla yanar. Ardından alttan soru kayar: “Birisi sizi bir yatırım fonuna veya güvenli hesaba para aktarmaya yönlendirdi mi?”</div>
+<p class="line"><span class="who k3">K3</span>(araya girer) Bankanız soru soruyorsa “hayır” deyin, konuştuğumuz gibi. Kendi paranız.</p>
+<p class="line"><span class="who k2">K2</span>(tereddütle) …Hayır. <i>(Hayır’a basar)</i></p>
+<div class="say"><span class="who">K1</span> Arkadaşımız yalan söyledi, çünkü öyle tembihlendi. Gerçek hayatta da kurbanlar tam olarak bunu yapıyor. Bu yüzden sistem tek bir cevaba güvenmiyor: kural skoru 80, eşik 70.</div>
+<div class="act"><b>Ekran:</b> kırmızı tam ekran “PARA GÖNDERİLMEDİ · Telefondaki görüşmeyi HEMEN kapatın · Maliye, savcılık, polis veya banka sizden telefonla ASLA para transferi istemez.”</div>
+<p class="line"><span class="who k2">K2</span>(okur) Bir dakika… bankam işlemi durdurdu. Görüşmeyi kapatmamı söylüyor.</p>
+<p class="line"><span class="who k3">K3</span>(sesi sertleşir) Hayır hayır, kapatmayın! Kontenjan kapanıyor, dosyanız iptal olur, sorumluluk sizde!</p>
+<p class="line"><span class="who k2">K2</span>Kusura bakmayın, ben bankamı arayacağım. (kapatır ve <b>“Görüşmeyi kapattım, Bankamı ara”</b>ya basar)</p>
+<div class="act"><b>Ekran:</b> “Akbank Güvenlik Hattı · Uygulama içinden doğrulanmış arama”, halkalar atar. K4’ün telefonu çalar (K2 gerçekten arar). Uygulama bağlanınca olay numarası çıkar: “Paran hesabında · işlem iptal edildi · alıcı hesap incelemeye işaretlendi”.</div>
+<p class="line"><span class="who k4">K4</span>Akbank Güvenlik Hattı, ben Elif. Uygulamamızdan bekletilen bir işlem için bizi aradığınızı görüyorum, kimliğinizi uygulama üzerinden doğruladık.</p>
+<p class="line"><span class="who k2">K2</span>Maliye’den biri aradı, vergi iadem varmış, bir fona yatırmam gerekiyormuş…</p>
+<p class="line"><span class="who k4">K4</span>Önce şunu bilin: paranız hesabınızda, hiçbir yere gitmedi. Hiçbir kamu kurumu vergi iadesi veya fon için telefonla para transferi istemez; resmî işlemler e-Devlet’ten yürür. İşlemi iptal ettik, alıcı hesabı inceleme için işaretlendi, olay numaranızı ilettik. Sizi arayan numarayı ihbar etmenizi öneririz. İyi günler.</p>
+<div class="act"><b>K2:</b> uygulamada ✕ “Görüşmeyi bitir”. Ana sayfada bakiye 100.000 TL, işlem “İptal edildi”.</div>
+<div class="say"><span class="who">K1</span> Dikkat ettiyseniz bu sefer bankayı arayan müşterinin kendisiydi, üstelik uygulamanın içinden. Kural basit: size gelen arama değil, sizin aradığınız resmî kanal güvenilirdir. Şimdi perdenin arkasına, SRE ekibinin bu sırada ne gördüğüne bakalım.</div>
+
+<h3><span class="who k5">K5</span> SRE paneli anlatımı (sağdaki panel) · ~60–75 sn</h3>
+<div class="say">Arkadaşımızın işlemi burada tek bir satır: HOLD, skor 80. Arka planda PaySim’den gelen normal trafik var; riskli işlem oranı yüzde 1,4, yani normal. Ama aynı dakikalarda aynı senaryo başka müşterilere de uygulanıyor.</div>
+<div class="act"><b>K5:</b> <b>⚡ Saldırı simüle et (8 kurban)</b> → satırlar tek tek düşer.</div>
+<div class="say">Olay logu, yani 4a: her işlem, zamanı ve skoruyla kayıtlı. Metrik, 4b: riskli işlem oranı yüzde 1,4’ten 6,7’ye çıktı. Alarm, 4c: yüzde ikiyi geçince kırmızı alarm, nöbetçi ekip bilgilendirildi. Otomasyon, 3a: eşiği geçen sekiz işlemin hepsi insan beklemeden otomatik bekletildi. Katır hesap: aynı alıcıya yarım saatte dört farklı yeni gönderici para yollamaya çalıştı; iki hesap tespit edilip donduruldu. Bu katır sinyali risk puanına da +30 olarak geri dönüyor. Ve aşağıda olay zaman çizelgesi: ilk HOLD, alarm, tespit ve otomatik aksiyon. Bu, birazdan anlatacağımız postmortem’in ham verisi. Bir not: tutarlar simülasyon, gerçek banka metriği değil.</div>
+<div class="act"><b>K5:</b> Sekme B’ye (sunum) geçer, Kapak’tan başlar. K3 salona döner.</div>
+
+<h2 class="pb">6. Sunum (Sekme B)</h2>
+
+<div class="slide"><h3><span><span class="who">K1</span> 00 Kapak · 01 Seçilen vaka</span><small>~45 sn</small></h3>
+<div class="say">Seçtiğimiz vaka, sosyal mühendislikle para gönderme. Fraud’un en zor yakalanan türü, çünkü giriş meşru, OTP meşru ve işlemi müşteri kendisi onaylıyor. Saldırı bankanın dışında, telefonda başlıyor; para da dakikalar içinde katır hesaplara dağılıyor.</div></div>
+
+<div class="slide"><h3><span><span class="who">K1</span> 02 Sahne 1’de ne oldu? · 6 taktik</span><small>~50 sn</small></h3>
+<div class="say">Arayan hiçbir teknik açık kullanmadı, altı psikolojik taktik kullandı. Otorite: “Maliye’den arıyorum”, sicil numarası. Güven tuzağı: önce para istemedi, vergi iadesi verdi. Açgözlülük: yüzde kırk getiri. Aciliyet: 17:00’de kapanıyor. Kaybetme korkusu: iade Hazine’ye geçer. Ve en önemlisi izolasyon: “Bankanız sorarsa yakınıma destek deyin.” Bu son madde az önce gördüğünüz ikinci sahnenin kilidiydi: kurban bankaya yalan söyledi, sistem yine de yakaladı.</div></div>
+
+<div class="slide"><h3><span><span class="who">K1</span> 03 Saldırı zinciri</span><small>~40 sn</small></h3>
+<div class="act">→ tuşuyla beş halkayı sırayla açın veya “▶ Saldırıyı akıt”.</div>
+<div class="say">Saldırının beş halkası var: temas, baskı, havale, dağıtım, fark etme. Her halkanın karşısında bir savunmamız var. Asıl müdahale noktamız üçüncü halka: para gitmeden önce, havale anında.</div></div>
+
+<div class="slide"><h3><span><span class="who">K1</span> 04 Katır hesap · 05 Engelleme çözümü</span><small>~60 sn</small></h3>
+<div class="say">Para, izini kaybettirmek için katır hesaplardan geçer. Bunu yakalamak için alıcıya bakıyoruz: yarım saatte dört farklı yeni gönderiden para alan hesap katır adayıdır ve dondurulur. Çözümümüzü eğitimdeki SRE gereksinimlerine birebir oturttuk: log toplama, metrik, alarm kriteri, otomasyon ve CI/CD. Şimdi bu sistemin kalbine, risk skoruna geçiyoruz.</div></div>
+
+<div class="slide"><h3><span><span class="who k2">K2</span> 06 Risk skoru: parametreler ve hesap</span><small>~90 sn</small></h3>
+<div class="act">Hesaplayıcıda “Yeni alıcı” ve “Yüksek tutar” açık başlar (55, onay). Konuşurken “İşlem sırasında aktif çağrı”ya tıklayın → 80, HOLD.</div>
+<div class="say">Az önce sahnede ben kurbandım; şimdi sistemin o işlemi nasıl puanlayacağını anlatayım. Beş parametremiz var ve her birinin sabit bir puanı var:</div>
+<table>
+  <tr><th>Parametre</th><th>Puan</th><th>Nereden gelir</th></tr>
+  <tr><td>Yeni alıcı (daha önce para gönderilmemiş)</td><td>+30</td><td>Banka sunucusu, alıcı geçmişi</td></tr>
+  <tr><td>Yüksek tutar (≥ 20.000 TL)</td><td>+25</td><td>Sunucu; ekranda bakiye oranı ve normal tutarın katı da gösterilir</td></tr>
+  <tr><td>İşlem sırasında aktif telefon görüşmesi</td><td>+25</td><td>Cihaz, sadece “arama var/yok”</td></tr>
+  <tr><td>Uzaktan erişim / ekran paylaşımı</td><td>+20</td><td>Cihaz</td></tr>
+  <tr><td>Katır hesap sinyali (30 dk’da ≥ 4 yeni gönderici)</td><td>+30</td><td>Sunucu, SRE paneli</td></tr>
+</table>
+<div class="say">Risk skoru bu puanların toplamı. 70 ve üzeri HOLD: para gönderilmez. 40–69 orta risk. Sahne 1’i bu sistemle düşünün: yeni alıcı 30, seksen beş bin lira 25, ve telefonda konuşuyordum, 25. Toplam 80. (tıklar) Tek başına hiçbiri suç değil, ama birlikte eşiği aşıyorlar. Bu ağırlıklar bizim v1 sözleşmemiz; gerçek banka verisiyle yeniden ayarlanmalı.</div></div>
+
+<div class="slide"><h3><span><span class="who k3">K3</span> 07 Skorun üç seviyesi</span><small>~45 sn</small></h3>
+<div class="say">Kurallar açıklanabilir ama elle ayarlanmış. Bu yüzden üç seviyeli düşündük. Birinci seviye az önce gördüğünüz kurallar. İkinci seviye lojistik regresyon: aynı sinyallerin ağırlıklarını veriden öğrenir ve hâlâ açıklanabilir. Üçüncü seviye gradient boosting: 60 karar ağacından oluşan, doğrusal olmayan ilişkileri yakalayan bir model. Sentetik veride, aynı yanlış alarm bütçesinde yakalama oranları yüzde 67, 84 ve 83.</div></div>
+
+<div class="slide"><h3><span><span class="who k3">K3</span> 08 Seviyeler birlikte: karar tablosu</span><small>~60 sn</small></h3>
+<div class="act">Senaryo düğmelerine sırayla basın: “Telefonda yönlendirme” → “Aramasız, tüm bakiye” → “Günlük transfer”.</div>
+<div class="say">Üç seviyenin puanlarını toplayıp ortalama almıyoruz. Üçü aynı anda puan üretir, karar sıralı bir tabloyla verilir ve ilk tutan satır kazanır. Satır 1: kural skoru 70’i geçtiyse HOLD. Satır 2: geçmediyse ama lojistik regresyon riskli diyorsa, model tek başına parayı durdurmaz, müşteriden ek doğrulama ister. Satır 3: müşteri “evet” ya da “emin değilim” derse veya doğrulama sırasında arama sürüyorsa HOLD. Satır 4: diğer her şey onay. Gradient boosting şimdilik gölge modda: puan üretir, loglanır, kararı etkilemez. Kendini kanıtlarsa ikinci satıra katılır. Neden ortalama değil? Puan ile olasılık toplanmaz, “neden durdu” sorusu açıkça cevaplanmalı ve bir model tek başına müşterinin parasını dondurmamalı.</div></div>
+
+<div class="slide"><h3><span><span class="who k3">K3</span> 09 Açık veri seti: PaySim nasıl entegre?</span><small>~60 sn</small></h3>
+<div class="say">Modelleri Kaggle’daki PaySim veri setiyle eğittik: 6,3 milyon sentetik mobil para işlemi. Sadece 532 bin para transferini kullandık; zamana göre ilk yüzde 70’i eğitim, son yüzde 30’u test. Python’da eğittiğimiz modellerin ağırlıklarını ve 60 ağacı bir dosyaya aktardık; uygulama tarayıcıda aynı hesabı yapıyor, Python ile fark yüz milyonda bir. Veri seti uygulamada üç yerde çalışıyor: “Veri setinden oynat” düğmesi gerçek etiketli işlemleri risk motorundan geçiriyor, SRE panelinin arka plan trafiği PaySim’in 140 normal işlemi, ve kayıtlı alıcıların geçmişi oradan geliyor. Sonuç: yakalama yüzde 95 ile 100. Ama dürüst olalım: bu iyimser, çünkü PaySim’de dolandırıcılığın yüzde 96’sı tüm bakiyeyi gönderiyor. O sinyali çıkarınca oran yüzde 27’ye düşüyor. Ders: tek sinyale güvenmek yok, cihaz ve çağrı sinyalleri şart.</div></div>
+
+<div class="slide"><h3><span><span class="who k4">K4</span> 10 Teknik analiz</span><small>~75 sn</small></h3>
+<div class="say">Mimari tek yönlü: telefon sinyal toplar, karar banka sunucusunda ve ödeme gitmeden önce verilir. İstemci puanı değiştirerek kontrolü aşamaz; tutar, bakiye ve alıcı geçmişi sunucuda doğrulanır. Risk motoru işlem başına yaklaşık 2 mikrosaniye sürüyor; gerçek sistemde ağ ve veri çekme süresi baskın olur. Telefon tarafı gerçekçi: Android’de izinle, iOS’ta CallKit ile sadece “arama var mı” bilgisi alınabilir; konuşma dinlenmez, numara alınmaz. Demoda bu sinyal simülasyon. Dolandırıcının atlatma hamlelerini de düşündük: “bankana hayır de” derse tek cevaba güvenmiyoruz; ikinci telefondan ararsa diğer sinyaller 55 puan verir ve model ek doğrulama ister. Aramayı önce kapattırırsa, tutarı bölerse, her kurbana yeni katır açarsa: bunlar için önerilerimiz var, onları açıkça “öneri” diye işaretledik.</div></div>
+
+<div class="slide"><h3><span><span class="who k4">K4</span> 11 Önleyici kontroller</span><small>~60 sn</small></h3>
+<div class="say">Önleyici kontrollerimizi dört katmanda topladık. Bir: işlem anında; canlı risk puanı, HOLD, ek doğrulama. İki: müşteriyi resmî kanala taşımak; “para gönderilmedi, görüşmeyi kapatın” uyarısı ve uygulama içinden doğrulanmış “Bankamı ara”. Üç: alıcı tarafı; katır hesap tespiti ve otomatik dondurma. Dört: sistemin kendisi; yeni model önce gölge modda, yanlış alarm oranı SRE’de izleniyor. Yeşiller demoda çalışıyor, sarılar yol haritamız: yeni alıcıya ilk yüksek transferde bekleme süresi, IBAN–isim eşleşmesi, hesap yaşı ve bankalar arası katır listesi. Yeşil olanların hepsini başta canlı gördünüz.</div></div>
+
+<h2 class="pb">7. Sunum: vaka sonrası ve kapanış (Sekme B)</h2>
+<div class="slide"><h3><span><span class="who k5">K5</span> 12 Vaka yaşanırsa ne yapılmalı?</span><small>~50 sn</small></h3>
+<div class="say">Önleme her zaman yüzde yüz değil. Vaka yaşanırsa altı adım: tespit, alarmla nöbetçi ekip haberdar olur. Etki analizi: kaç müşteri, ne kadar tutar, hangi hesaplar. Acil aksiyon: işlemi durdur, katır hesapları dondur, müşteriyi ara. Kök neden: kural neden yakalamadı. Postmortem. Ve iyileştirme: yeni kural, metrik, runbook.</div></div>
+<div class="slide"><h3><span><span class="who k5">K5</span> 13 Kök neden: blameless postmortem</span><small>~40 sn</small></h3>
+<div class="say">Postmortem’de kişiyi değil sistemi sorguluyoruz. Sahne 1’deki Karabanka neden yakalayamadı? Yeni alıcı ve yüksek tutar için kural yoktu, çağrı sinyali loglanmıyordu, katır girişleri izlenmiyordu, alarm yoktu; müşteri şikâyetiyle öğrenildi. Her birinin karşılığında bir önlem var ve hepsini az önce canlı gördünüz.</div></div>
+<div class="slide"><h3><span><span class="who k5">K5</span> 14 Kazanım: önce ve sonra</span><small>~30 sn</small></h3>
+<div class="say">Önce tespit saatler sonra müşteri şikâyetiyle oluyordu; şimdi işlem anında. Müdahale manuel ve geçti; şimdi otomatik HOLD ve katır dondurma. Para çoğunlukla geri alınamıyordu; demoda dolandırıcılık işlemlerinin hepsi para çıkmadan durdu.</div></div>
+<div class="slide"><h3><span><span class="who k5">K5</span> 15 Finansal zarar analizi</span><small>~90 sn</small></h3>
+<div class="act">Hesap makinesinde önce “Beklenen %60”, sonra “Kötümser %27” düğmesi.</div>
+<div class="say">90 saniyede 85.000 lira: kim öder? Müşteri, birikiminin yüzde 85’ini kaybetti. Banka: İngiltere’de 2024’te 450,7 milyon sterlinlik APP kaybının yüzde 59’unu bankalar geri ödedi ve Ekim 2024’ten beri 85.000 sterline kadar geri ödeme zorunlu. Üstelik bu maliyet gönderen ve alıcı banka arasında yarı yarıya bölünüyor; yani katır hesabı yakalamak doğrudan para demek. Türkiye için kamuya açık toplam kayıp verisi bulamadık, bu yüzden parametrik bir model kurduk; banka kendi verisini girer. Varsayımımız: yılda bin vaka, vaka başı 85.000 lira. Çözüm olmadan yıllık kayıp 80,8 milyon lira. Yüzde 60 yakalamayla 48,5 milyon lira para çıkmadan duruyor; yanlış alarmların maliyeti 2 milyon, çünkü çoğu uygulama içi kısa bir soru. (Kötümser’e basar) En kötümser ölçümümüzle, yüzde 27’de bile net fayda 20 milyon liranın üzerinde. HOLD para çıkmadan olduğu için geri alma maliyeti de oluşmuyor.</div></div>
+<div class="slide"><h3><span><span class="who">K1</span> 16 Özet ve kapanış</span><small>~40 sn</small></h3>
+<div class="say">Başta arkadaşımız Karabanka’da doksan saniyede seksen beş bin lira kaybetti. Sonda Akbank’ta aynı arama, aynı kişi, aynı yalan; ama para hesapta kaldı. Aradaki fark: tek tek masum görünen sinyalleri birlikte okuyan bir sistem ve bunu izleyen, ölçen, sürekli iyileştiren bir SRE kültürü. Arayanı bilemeyiz, ama davranışı görürüz. Teşekkür ederiz, sorularınızı alabiliriz.</div></div>
+
+<h2 class="pb">8. Soru-cevap hazırlığı</h2>
+<table>
+  <tr><th style="width:34%">Olası soru</th><th>Kısa cevap</th><th style="width:9%">Kim</th></tr>
+  <tr><td>Puanlar (30, 25, 25, 20, 30) nereden geliyor?</td><td>v1 sözleşmesinde başlangıç referansı; gerçek banka verisiyle lojistik regresyon ağırlıklarıyla yeniden ayarlanır. Bu yüzden ikinci seviye var.</td><td>K2</td></tr>
+  <tr><td>Masum müşteri bekletilirse?</td><td>Çoğu durumda HOLD değil, uygulama içi kısa soru. Yanlış alarm oranı SRE’de izleniyor; yeni kural önce gölge modda denenir.</td><td>K4</td></tr>
+  <tr><td>Telefon görüşmesini gerçekten görebilir misiniz?</td><td>Android izinle, iOS CallKit ile sadece “arama var/yok”. Ses ve numara yok. Demoda simülasyon; görüşme bilgisi olmasa da diğer sinyaller ve model çalışır.</td><td>K4</td></tr>
+  <tr><td>Neden model karar vermiyor?</td><td>Bir modelin tek başına müşterinin parasını dondurması açıklanabilir değil. Model ek doğrulama ister, kesin kararı açıklanabilir kurallar verir.</td><td>K3</td></tr>
+  <tr><td>PaySim gerçekçi mi?</td><td>Sentetik bir simülatör; sonuçları iyimser buluyoruz ve bunu açıkça söylüyoruz (güçlü sinyal olmadan %27). Amaç yaklaşımların farkını göstermek.</td><td>K3</td></tr>
+  <tr><td>Türkiye verisi?</td><td>Kamuya açık toplam APP kaybı bulamadık; finansal model parametrik, banka kendi verisini girer.</td><td>K5</td></tr>
+  <tr><td>KVKK?</td><td>Ses, rehber, arama geçmişi alınmıyor; sadece işlem anında “arama var/yok” bayrağı. İzin ve aydınlatma ayrıca değerlendirilmeli.</td><td>K4</td></tr>
+  <tr><td>Dolandırıcı “önce aramayı kapat” derse?</td><td>Öneri: son 10 dakikada biten bilinmeyen arama da sinyal sayılır. Ayrıca yeni alıcı + tutar zaten 55 puan, model ek doğrulama ister.</td><td>K4</td></tr>
+</table>
+
+<h2>9. Yedek planlar</h2>
+<ul>
+  <li><b>Arama gelmezse (20 sn):</b> K1 “Teknoloji bazen bizi de dolandırıyor” der; sahne 1 ses kaydı oynatılır, K2 uygulamada eşlik eder.</li>
+  <li><b>Arama düşerse:</b> K2 “Hattan düştü, kaldığımız yerden devam edelim” der; kayıttan devam edilir.</li>
+  <li><b>Uygulama donarsa:</b> sayfayı yenileyin; mod ve bakiye sıfırlanır. Sahne 1 için adres sonuna <code>?mod=korumasiz</code>.</li>
+  <li><b>K4’ün telefonu çalmazsa:</b> K4 ayağa kalkıp konuşmayı canlı yapar.</li>
+  <li><b>Kısaltma gerekirse:</b> 03 ve 07’yi birer cümleye indirin, 15’i atlayın; sahne 1’de “Yüzde kırk mı?” ve “fazla değil mi?” kısaltılabilir.</li>
+</ul>
+<p class="sub">Prova: en az iki tam prova, biri projeksiyonla. Arayan kibar ve sakin konuşmalı; sadece sahne 2’deki “kapatmayın!” anında ses sertleşir. Kurban saf görünmemeli; jüri “ben de kanabilirdim” demeli.</p>
+
+</body>
+</html>

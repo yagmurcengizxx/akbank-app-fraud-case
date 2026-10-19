@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telefon Demosu · APP Fraud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Schibsted+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1614; --ink-2: #221d1a; --ink-3: #2c2522; --line: #3a312c; --paper: #efe8dc; --muted: #a89c8c;
+    --red: #f0475e; --red-deep: #c8213a; --gold: #e8b23a; --ok: #6fbf8a;
+    --serif: 'Fraunces', Georgia, serif; --sans: 'Schibsted Grotesk', -apple-system, 'Segoe UI', Arial, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 15px; }
+  header { display: flex; align-items: baseline; gap: 14px; padding: 18px 28px 0; flex-wrap: wrap; }
+  header h1 { font-family: var(--serif); font-size: 26px; margin: 0; }
+  header h1 em { font-style: normal; color: var(--red); }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 360px minmax(0, 1fr) minmax(0, 1fr); gap: 22px; padding: 18px 22px 22px; align-items: start; }
+  @media (max-width: 1180px) { .layout { grid-template-columns: 360px minmax(0, 1fr); } .sre { grid-column: 2; } }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; padding: 16px; } .sre { grid-column: auto; } header { padding: 16px 16px 0; } }
+
+  /* ---------- iPhone çerçevesi ---------- */
+  .left { position: sticky; top: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  @media (max-width: 900px) { .left { position: static; } }
+  /* Laptop/projeksiyon: telefon ekran yüksekliğine sığsın */
+  @media (min-width: 901px) and (max-height: 880px) { .left { zoom: .88; } }
+  @media (min-width: 901px) and (max-height: 780px) { .left { zoom: .74; } }
+  @media (min-width: 901px) and (max-height: 680px) { .left { zoom: .64; } }
+  .iphone { width: 340px; height: 690px; border-radius: 54px; background: #0b0b0c; padding: 13px; position: relative; box-shadow: 0 0 0 2px #3b3b3f, 0 30px 60px rgba(0,0,0,.5); }
+  .iphone::before, .iphone::after { content: ""; position: absolute; width: 4px; background: #2a2a2d; border-radius: 2px; }
+  .iphone::before { left: -4px; top: 150px; height: 60px; } .iphone::after { right: -4px; top: 190px; height: 90px; }
+  @media (max-width: 420px) { .iphone { transform: scale(.86); transform-origin: top center; margin-bottom: -110px; } }
+  .screen { width: 100%; height: 100%; border-radius: 42px; overflow: hidden; position: relative; background: #f5f5f7; color: #262629; display: flex; flex-direction: column; font-family: 'Segoe UI', Arial, sans-serif;
+    --ak-red: #e30613; --ak-ink: #262629; --ak-muted: #73747a; --ak-line: #e6e7eb; --ak-green: #16704e; --ak-amber: #9a6208; }
+  .screen button { font-family: inherit; cursor: pointer; }
+  .screen button:disabled { cursor: not-allowed; opacity: .5; }
+  .screen .hidden { display: none !important; }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 112px; height: 32px; background: #000; border-radius: 20px; z-index: 30; transition: width .35s; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--ok); font: 600 11px var(--sans); }
+  .island.call { width: 150px; }
+  .island .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); display: none; }
+  .island.call .dot { display: block; }
+  .homebar { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 3px; background: #242428; z-index: 30; }
+
+  /* Güvenli An tasarımı (Guvenli-An-Demo.html) telefonun içine uyarlandı */
+  .ak-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+  .ak-scroll::-webkit-scrollbar { display: none; }
+  .ak-top { background: linear-gradient(140deg, #fa3442 0%, #ed0512 48%, #d9000b 100%); color: #fff; padding: 0 16px; }
+  .ak-status { height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 4px 10px 0; font-size: 12px; font-weight: 700; }
+  .ak-share { display: none; background: #fff; color: var(--ak-red); font-size: 10px; font-weight: 700; text-align: center; border-radius: 9px; padding: 5px 8px; margin: 0 0 10px; }
+  .ak-share.on { display: block; }
+  .ak-welcome { display: flex; align-items: center; gap: 9px; }
+  .ak-avatar { width: 33px; height: 33px; border: 2px solid #fff; border-radius: 50%; display: grid; place-items: center; font-size: 18px; font-weight: 800; flex-shrink: 0; }
+  .ak-welcome strong { display: block; font-size: 12px; font-weight: 600; }
+  .ak-welcome div > span { display: block; font-size: 10px; opacity: .9; }
+  .ak-help { margin-left: auto; color: #fff; border: 0; background: #ffffff18; border-radius: 50%; height: 29px; width: 29px; font-size: 17px; line-height: 1; flex-shrink: 0; }
+  .ak-user { height: 27px; width: 27px; border-radius: 50%; background: #fce2dc; color: #9b212b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .ak-topline { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 11px; border-top: 1px solid #ffffff26; }
+  .ak-topline > span:first-child { font-size: 14px; font-style: italic; font-weight: 800; letter-spacing: -.7px; }
+  .ak-demo { font-size: 8px; letter-spacing: 1px; background: #ffffff22; border: 1px solid #ffffff30; padding: 3px 6px; border-radius: 5px; }
+  .ak-intro { text-align: center; padding: 15px 0 30px; }
+  .ak-segments { display: flex; align-items: center; justify-content: space-between; margin: 0 -4px 20px; white-space: nowrap; }
+  .ak-segments button { background: none; border: 0; color: #fff; border-radius: 18px; font-size: 9.5px; padding: 6px 9px; }
+  .ak-segments button.selected { background: #ffffff30; font-weight: 700; }
+  .ak-segments > span { font-size: 9.5px; opacity: .75; padding: 6px 2px; }
+  .ak-intro > p { font-size: 9px; letter-spacing: 1.3px; margin: 0 0 2px; opacity: .9; }
+  .ak-intro > strong { display: block; font-size: 29px; letter-spacing: -1px; font-weight: 600; }
+  .ak-acct-type { display: block; font-size: 10px; margin: 4px 0 17px; opacity: .9; }
+  .ak-shortcuts { display: flex; justify-content: center; gap: 24px; }
+  .ak-shortcuts button { border: 0; background: none; color: #fff; font-size: 9.5px; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .ak-shortcuts i { font-style: normal; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #ffffff25; font-size: 20px; }
+  .ak-title { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+  .ak-title button { font-size: 30px; line-height: 1; color: #fff; background: none; border: 0; padding: 0 10px 0 0; }
+  .ak-title strong { font-size: 15px; font-weight: 600; }
+  .ak-title > span { font-size: 18px; }
+
+  .screen .view { display: none; } .screen .view.on { display: block; animation: slide .3s ease; }
+  @keyframes slide { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+
+  /* Ana sayfa */
+  .ak-home { padding: 0 14px 18px; }
+  .ak-search { position: relative; margin: -15px 3px 20px; background: #fff; padding: 9px 12px; border-radius: 24px; box-shadow: 0 4px 12px #0000000b; color: #929299; font-size: 11px; }
+  .ak-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+  .ak-heading strong { font-size: 12px; font-weight: 650; } .ak-heading > span { font-size: 8px; letter-spacing: .8px; color: #929299; }
+  .ak-cards { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px; }
+  .ak-acard { display: block; background: #fff; text-align: left; border: 1px solid #ececef; border-radius: 11px; padding: 12px 11px; min-width: 0; color: var(--ak-ink); }
+  .ak-acard > div { display: flex; align-items: center; gap: 6px; }
+  .ak-acard i { font-style: normal; background: var(--ak-red); color: #fff; display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; font-weight: 750; font-size: 11px; }
+  .ak-acard strong { font-size: 10px; } .ak-acard div > span { margin-left: auto; font-size: 9px; }
+  .ak-acard small { font-size: 8px; display: block; color: #929299; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ak-acard em { display: block; font-style: normal; font-size: 9px; margin: 16px 0 3px; }
+  .ak-acard b { font-size: 15px; letter-spacing: -.5px; white-space: nowrap; }
+  .ak-mini { background: #64b4b9; border-radius: 11px; color: #fff; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .ak-wing { height: 22px; width: 22px; border: 1px solid #ffffff80; border-radius: 50%; display: grid; place-items: center; font-size: 12px; }
+  .ak-mini strong { font-size: 10px; } .ak-mini > span:not(.ak-wing) { font-size: 8px; opacity: .8; }
+  .ak-mini small { font-size: 8px; margin-top: 10px; opacity: .9; } .ak-mini b { font-size: 19px; font-style: italic; font-weight: 500; }
+  .ak-banner { width: 100%; display: flex; align-items: center; gap: 9px; text-align: left; background: #fff; border: 1px solid #f3d8db; border-radius: 11px; padding: 11px 10px; margin-top: 14px; color: var(--ak-ink); }
+  .ak-shield { width: 28px; height: 32px; background: #fff0f1; color: var(--ak-red); display: grid; place-items: center; border-radius: 8px 8px 12px 12px; flex-shrink: 0; }
+  .ak-banner strong { display: block; font-size: 10px; } .ak-banner small { display: block; font-size: 8.5px; color: var(--ak-muted); margin-top: 3px; }
+  .ak-banner > b { color: var(--ak-red); margin-left: auto; font-size: 22px; }
+  .ak-tx { background: #fff; border: 1px solid #ececef; border-radius: 10px; padding: 9px 11px; display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+  .ak-tx small { display: block; color: #929299; font-size: 9px; }
+  .ak-tx .neg { font-weight: 700; white-space: nowrap; } .ak-tx .hold { color: var(--ak-red); font-weight: 700; white-space: nowrap; }
+  .ak-primary { width: 100%; background: var(--ak-red); border: 0; color: #fff; padding: 13px 14px; border-radius: 8px; font-weight: 650; font-size: 12px; margin-top: 13px; }
+  .ak-secondary { width: 100%; background: #fff; border: 1px solid var(--ak-line); color: var(--ak-ink); padding: 12px; border-radius: 8px; font-size: 12px; margin-top: 8px; }
+  .ak-home-send { text-align: left; } .ak-home-send span { float: right; }
+  .ak-foot { text-align: center; font-size: 8.5px; color: var(--ak-muted); margin: 12px 0 0; }
+
+  /* Transfer ve güvenlik kontrolü ekranları */
+  .ak-body { background: #fff; padding: 18px; min-height: 100%; }
+  .ak-steps { display: flex; align-items: center; gap: 8px; justify-content: space-between; margin-bottom: 16px; }
+  .ak-step { font-size: 10px; color: #a0a0a7; white-space: nowrap; } .ak-step b { font-weight: 400; margin-left: 3px; }
+  .ak-step.current { color: var(--ak-red); } .ak-step.current b { font-weight: 650; } .ak-step.done { color: var(--ak-green); }
+  .ak-steps > i { flex: 1; height: 1px; background: #e5e5e9; }
+  .ak-body label { display: block; font-size: 11px; color: #45454d; font-weight: 600; margin: 14px 0 6px; }
+  .ak-body select, .ak-body input { width: 100%; border: 1px solid #e1e1e7; border-radius: 7px; padding: 11px; font: inherit; font-size: 12px; color: var(--ak-ink); background: #fff; min-width: 0; }
+  .ak-iban { font: 9px/1.5 Consolas, monospace; color: var(--ak-muted); padding: 6px 1px; overflow-wrap: anywhere; }
+  .ak-amount { position: relative; } .ak-amount input { font-size: 24px; font-weight: 600; padding-right: 42px; }
+  .ak-amount span { position: absolute; right: 13px; top: 17px; color: var(--ak-muted); font-size: 13px; }
+  .ak-chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .ak-chips button { border: 1px solid #e1e1e7; background: #fff; border-radius: 20px; padding: 5px 10px; font-size: 10.5px; color: var(--ak-ink); }
+  .ak-hint { font-size: 9.5px; color: var(--ak-muted); margin: 8px 0; }
+  .ak-source { display: flex; align-items: center; gap: 8px; background: #f6f6f8; border-radius: 8px; padding: 11px 9px; margin: 14px 0 4px; }
+  .ak-src-icon { width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--ak-red); font-weight: 800; flex-shrink: 0; }
+  .ak-source strong { display: block; font-size: 9.5px; } .ak-source small { display: block; font-size: 8.5px; color: #85858e; }
+  .ak-source > b { margin-left: auto; font-size: 11px; white-space: nowrap; }
+  .ak-protected { display: flex; gap: 6px; justify-content: center; align-items: center; font-size: 9px; color: #73747c; margin: 14px 0 0; }
+  .ak-protected > span { color: #147652; font-size: 14px; }
+  .ak-icon { width: 45px; height: 45px; border-radius: 13px; background: #f8e8e8; color: var(--ak-red); display: grid; place-items: center; font-size: 22px; font-weight: 700; }
+  .ak-icon.ok { background: #eaf4ee; color: var(--ak-green); } .ak-icon.warn { background: #faf0db; color: var(--ak-amber); }
+  .ak-eyebrow { text-transform: uppercase; letter-spacing: 2px; font-size: 9.5px; font-weight: 700; color: var(--ak-red); margin-top: 14px; }
+  .ak-body h2 { font-size: 21px; line-height: 1.2; letter-spacing: -.6px; margin: 10px 0 8px; }
+  .ak-text { font-size: 11.5px; color: var(--ak-muted); margin: 0 0 12px; line-height: 1.5; }
+  .ak-details { font-size: 11px; padding: 11px 12px; background: #f6f3ee; border-radius: 10px; }
+  .ak-row { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; } .ak-row strong { text-align: right; overflow-wrap: anywhere; }
+  .ak-why { font-size: 11px; margin: 10px 0 0; padding-left: 18px; color: var(--ak-ink); } .ak-why li { margin: 3px 0; }
+  .ak-questions { background: #f6f3ee; border-radius: 10px; padding: 12px; margin-top: 12px; }
+  .ak-questions label { margin: 0 0 6px; } .ak-questions select { margin-bottom: 10px; }
+  .ak-error { color: #b4232c; font-size: 10.5px; margin-top: 6px; }
+  .ak-case { padding: 10px; border-radius: 9px; background: #edf5ef; font-size: 11.5px; color: var(--ak-green); margin-top: 10px; }
+
+  /* Alt menü */
+  .ak-nav { display: flex; justify-content: space-around; padding: 8px 4px 22px; background: #fff; border-top: 1px solid #e9e9ed; flex-shrink: 0; }
+  .ak-nav button { background: none; border: 0; color: #7b7b83; font-size: 8.5px; padding: 0 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .ak-nav button > span { font-size: 21px; line-height: 1.1; }
+  .ak-nav button.selected { color: var(--ak-red); font-weight: 600; }
+
+  /* Gelen arama ekranı */
+  .callui { position: absolute; inset: 0; z-index: 25; background: linear-gradient(180deg, #3a3a3c, #1c1c1e); color: #fff; display: none; flex-direction: column; align-items: center; padding-top: 110px; }
+  .callui.on { display: flex; animation: slide .3s ease; }
+  .callui .who { font-size: 30px; font-weight: 600; } .callui .num { color: #c7c7cc; margin-top: 6px; }
+  .callui .tag { margin-top: 14px; background: rgba(240,71,94,.2); color: #ff8a9a; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 10px; }
+  .callui .btns { margin-top: auto; margin-bottom: 90px; display: flex; gap: 90px; }
+  .callui .btns button { width: 70px; height: 70px; border-radius: 50%; border: 0; font-size: 28px; color: #fff; cursor: pointer; }
+  .callui .btns small { display: block; text-align: center; margin-top: 8px; font-size: 12px; color: #c7c7cc; }
+
+  /* ---------- Sahne senaryosu: modlar, ekran katmanları ve animasyonlar ---------- */
+  .screen.unprotected .prot-only { display: none !important; }
+  /* Karabanka (Sahne 1): kırmızı alanlar siyah */
+  .screen.unprotected { --ak-red: #1c1c1e; }
+  .screen.unprotected .ak-top, .screen.unprotected .ak-login { background: linear-gradient(160deg, #3a3a3c 0%, #1c1c1e 55%, #000 100%); }
+  .screen.unprotected .ak-user { background: #e5e5ea; color: #1c1c1e; }
+  .screen.unprotected .ak-spinner::before { border-color: #e5e5ea; border-top-color: #1c1c1e; }
+  .ak-overlay { position: absolute; inset: 0; z-index: 24; display: none; flex-direction: column; align-items: center; text-align: center; }
+  .ak-overlay.on { display: flex; }
+
+  /* Giriş: Face ID tarzı tarama */
+  .ak-login { z-index: 23; background: linear-gradient(160deg, #fa3442 0%, #ed0512 50%, #b8000a 100%); color: #fff; padding: 120px 24px 40px; }
+  .ak-login.out { animation: loginOut .45s ease forwards; }
+  @keyframes loginOut { to { opacity: 0; transform: scale(1.06); } }
+  .ak-login-brand { font-size: 22px; font-style: italic; font-weight: 800; letter-spacing: -.8px; }
+  .ak-login-hi { font-size: 13px; opacity: .9; margin-top: 4px; }
+  .ak-face { position: relative; width: 96px; height: 96px; margin: 70px 0 18px; border: 0; background: #ffffff1c; border-radius: 28px; color: #fff; display: grid; place-items: center; }
+  .ak-face svg { width: 54px; height: 54px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .ak-face .ring { position: absolute; inset: -8px; border-radius: 34px; border: 2px dashed #ffffff00; }
+  .ak-face.scan .ring { border-color: #ffffffb0; animation: spin 1s linear infinite; }
+  .ak-face.scan svg { animation: breathe .5s ease-in-out infinite alternate; }
+  .ak-face.ok { background: #34c759; transition: background .25s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes breathe { to { transform: scale(.9); opacity: .75; } }
+  .ak-login-cta { font-size: 13px; font-weight: 600; }
+  .ak-login small { margin-top: auto; font-size: 9.5px; opacity: .8; }
+
+  /* İşlem kontrol ediliyor */
+  .ak-proc { background: #ffffffe8; backdrop-filter: blur(4px); justify-content: center; gap: 10px; color: var(--ak-ink); animation: fadeIn .2s ease; }
+  .ak-spinner { position: relative; width: 70px; height: 70px; display: grid; place-items: center; }
+  .ak-spinner::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 4px solid #f3d8db; border-top-color: var(--ak-red); animation: spin .8s linear infinite; }
+  .ak-spinner span { width: 34px; height: 38px; background: #fff0f1; color: var(--ak-red); display: grid; place-items: center; border-radius: 9px 9px 15px 15px; font-weight: 800; }
+  .ak-proc b { font-size: 14px; } .ak-proc small { font-size: 10.5px; color: var(--ak-muted); }
+  .screen.unprotected .ak-spinner span { display: none; }
+  @keyframes fadeIn { from { opacity: 0; } }
+
+  /* Alttan kayan soru */
+  .ak-sheetwrap { background: #0007; justify-content: flex-end; animation: fadeIn .2s ease; }
+  .ak-sheet { width: 100%; background: #fff; color: var(--ak-ink); border-radius: 22px 22px 0 0; padding: 10px 20px 34px; text-align: left; animation: sheetUp .38s cubic-bezier(.2,.8,.2,1); }
+  @keyframes sheetUp { from { transform: translateY(100%); } }
+  .ak-grab { width: 38px; height: 4px; border-radius: 3px; background: #d6d6dc; margin: 0 auto 14px; }
+  .ak-sheet h3 { font-size: 17px; margin: 12px 0 6px; letter-spacing: -.3px; }
+  .ak-sheet p { font-size: 12.5px; line-height: 1.5; margin: 0 0 14px; color: #45454d; }
+  .ak-yesno { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ak-yesno .ak-secondary { margin: 0; font-weight: 700; font-size: 13px; padding: 13px; }
+  .ak-sheet small { display: block; font-size: 9.5px; color: var(--ak-muted); margin-top: 10px; }
+
+  /* PARA GÖNDERİLMEDİ */
+  .ak-hold { background: linear-gradient(170deg, #d9000b, #8f000a); color: #fff; padding: 74px 20px 26px; justify-content: flex-start; animation: holdIn .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes holdIn { 0% { opacity: 0; transform: scale(1.08); } 60% { opacity: 1; transform: scale(.98); } 75% { transform: translateX(-6px); } 85% { transform: translateX(6px); } 100% { transform: none; } }
+  .ak-hold-icon { position: relative; width: 78px; height: 78px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 36px; }
+  .ak-hold-icon::before, .ak-hold-icon::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #ffffffaa; animation: pulseRing 1.6s ease-out infinite; }
+  .ak-hold-icon::after { animation-delay: .8s; }
+  @keyframes pulseRing { from { transform: scale(1); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
+  .ak-hold h2 { font-size: 23px; letter-spacing: -.5px; margin: 22px 0 8px; }
+  .ak-hold p { font-size: 12.5px; line-height: 1.5; margin: 0 0 12px; }
+  .ak-hold-card { background: #ffffff1f; border: 1px solid #ffffff40; border-radius: 12px; padding: 11px 12px; font-size: 12px; line-height: 1.45; }
+  .ak-hold-why { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+  .ak-hold-why li { font-size: 9.5px; background: #00000030; border-radius: 10px; padding: 4px 8px; opacity: 0; animation: chipIn .35s ease forwards; }
+  @keyframes chipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .ak-hold-btn { margin-top: auto; width: 100%; background: #fff; color: #c8000b; border: 0; border-radius: 12px; padding: 15px; font-size: 13.5px; font-weight: 800; animation: btnGlow 1.8s ease-in-out infinite; }
+  @keyframes btnGlow { 50% { box-shadow: 0 0 0 6px #ffffff40; } }
+  .ak-hold small { font-size: 9.5px; opacity: .85; margin-top: 9px; }
+
+  /* Bankamı ara */
+  .ak-bank { z-index: 26; background: linear-gradient(180deg, #24343a, #121a1d); color: #fff; padding: 92px 22px 30px; animation: fadeIn .3s ease; }
+  .ak-bank-avatar { position: relative; width: 84px; height: 84px; border-radius: 50%; background: #e30613; display: grid; place-items: center; font-size: 22px; font-weight: 800; font-style: italic; }
+  .ak-bank-avatar i { position: absolute; inset: 0; border-radius: 50%; border: 2px solid #34c759; animation: pulseRing 1.8s ease-out infinite; }
+  .ak-bank-avatar i + i { animation-delay: .9s; }
+  .ak-bank.connected .ak-bank-avatar i { display: none; }
+  .ak-bank .who { font-size: 20px; font-weight: 600; margin-top: 22px; }
+  .ak-verified { margin-top: 8px; font-size: 10.5px; color: #8ee6a8; background: #34c75922; border-radius: 10px; padding: 4px 9px; }
+  .ak-bank-status { margin-top: 12px; color: #c7c7cc; font-size: 13px; }
+  .dots::after { content: ""; animation: dots 1.2s steps(4) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+  .ak-incident { display: none; margin-top: 20px; width: 100%; background: #ffffff12; border: 1px solid #ffffff26; border-radius: 12px; padding: 12px; text-align: left; font-size: 11.5px; line-height: 1.6; }
+  .ak-incident.on { display: block; animation: sheetUp .45s cubic-bezier(.2,.8,.2,1); }
+  .ak-incident b { color: #8ee6a8; }
+  .ak-bank-end { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .ak-bank-end button { width: 64px; height: 64px; border-radius: 50%; border: 0; background: #ff3b30; color: #fff; font-size: 24px; }
+  .ak-bank-end small { font-size: 11px; color: #c7c7cc; }
+  .ak-bank .foot { font-size: 9px; color: #8e8e93; margin: 10px 0 0; }
+
+  /* Başarılı: onay işareti çizilir */
+  .ak-done { text-align: center; }
+  .ak-done .ak-details { text-align: left; }
+  .ak-check { width: 76px; height: 76px; margin: 18px auto 4px; display: block; }
+  .ak-check circle { fill: none; stroke: #34c759; stroke-width: 3; stroke-dasharray: 152; stroke-dashoffset: 152; }
+  .ak-check path { fill: none; stroke: #34c759; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; }
+  .view.on .ak-check circle { animation: draw .55s ease forwards; }
+  .view.on .ak-check path { animation: draw .35s ease .45s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .ak-intro > strong.tick { animation: tick .9s ease; }
+  @keyframes tick { 0%, 100% { color: #fff; } 30% { color: #ffd0d4; } }
+
+  /* Telefonun altındaki simülasyon kontrolleri */
+  .simbar { width: 340px; max-width: 100%; background: var(--ink-2); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+  .simbar .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .simbar .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sbtn { font: 600 13px var(--sans); background: var(--ink-3); color: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; cursor: pointer; }
+  .sbtn[aria-pressed="true"] { background: var(--red-deep); border-color: var(--red-deep); color: #fff; }
+  .sbtn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+
+  /* ---------- Sağ panel: algoritma ---------- */
+  .panel { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 6px; }
+  @media (max-width: 1180px) { .panel, .sre { position: static; max-height: none; } }
+  .panel h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 4px; }
+  .panel .lead { color: var(--muted); margin: 0 0 14px; font-size: 13.5px; }
+  .live { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 700px) { .live { grid-template-columns: repeat(2, 1fr); } }
+  .chip { background: var(--ink-2); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; transition: border-color .3s, background .3s; }
+  .chip small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; }
+  .chip b { font-size: 15px; }
+  .chip.hot { border-color: var(--red); background: #2d1c1e; }
+  .feed { background: var(--ink-2); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; height: 104px; overflow-y: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-bottom: 16px; }
+  .feed div { padding: 2px 0; } .feed div b { color: var(--paper); font-weight: 500; }
+  .feed div.new { animation: flash 1s ease; } @keyframes flash { from { color: var(--gold); } }
+
+  .pipeline { display: flex; flex-direction: column; gap: 10px; }
+  .stage { background: var(--ink-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; opacity: .35; transition: opacity .4s, border-color .4s; }
+  .stage.on { opacity: 1; border-color: #4a3f39; }
+  .stage.active { border-color: var(--gold); }
+  .stage h3 { margin: 0 0 8px; font-size: 14px; display: flex; gap: 10px; align-items: center; }
+  .stage h3 span { font-family: var(--mono); font-size: 11px; background: var(--ink-3); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--muted); }
+  .stage.on h3 span { background: var(--red); border-color: var(--red); color: #fff; }
+  .stage .empty { color: var(--muted); font-size: 13px; }
+  pre.json { margin: 0; font-family: var(--mono); font-size: 11.5px; color: #d9cfbf; white-space: pre-wrap; word-break: break-all; max-height: 92px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  @media (max-width: 700px) { .fgrid { grid-template-columns: 1fr; } }
+  td { padding: 5px 4px; border-bottom: 1px solid var(--line); } td:last-child { text-align: right; font-family: var(--mono); }
+  .rule { opacity: 0; transform: translateX(-6px); transition: opacity .3s, transform .3s; }
+  .rule.in { opacity: 1; transform: none; }
+  .yes { color: var(--red); font-weight: 700; } .no { color: var(--muted); } .na { color: var(--gold); }
+  .scorebar { position: relative; height: 10px; background: var(--ink-3); border-radius: 5px; margin: 12px 0 4px; }
+  .scorebar i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 5px; background: var(--ok); transition: width .6s cubic-bezier(.2,.7,.2,1); }
+  .scorebar .thr { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--paper); }
+  .sb-legend { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .contrib { display: grid; grid-template-columns: 130px 1fr 56px; gap: 8px; align-items: center; font-size: 12.5px; margin: 4px 0; }
+  .contrib .track { position: relative; height: 10px; background: var(--ink-3); border-radius: 3px; }
+  .contrib .track::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line); }
+  .contrib .track i { position: absolute; top: 0; bottom: 0; border-radius: 3px; transition: width .6s, left .6s; }
+  .contrib .v { font-family: var(--mono); text-align: right; }
+  .prob { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
+  .prob b { font-family: var(--serif); font-size: 32px; }
+  .dt { display: grid; grid-template-columns: 26px 1fr auto; font-size: 12.5px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .dt > div { display: contents; }
+  .dt span { padding: 7px 9px; border-bottom: 1px solid var(--line); }
+  .dt > div:last-child span { border-bottom: 0; }
+  .dt .n { font-family: var(--mono); color: var(--muted); text-align: center; }
+  .dt .res { font-family: var(--mono); font-size: 11.5px; text-align: right; white-space: nowrap; }
+  .dt .skip span { color: var(--muted); }
+  .dt .pass span { color: var(--muted); text-decoration: line-through; text-decoration-color: #5a4f48; }
+  .dt .hit span { background: #2d1c1e; color: var(--paper); font-weight: 600; }
+  .dt .hit .res { color: var(--red); }
+  .dt .next span { background: #33290f; color: var(--gold); }
+  .dt .shadow span { background: var(--ink-3); color: var(--muted); font-style: italic; }
+  .shadowbox { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .shadowbox b { font-family: var(--serif); font-size: 32px; }
+  .agree { display: inline-block; font-size: 12.5px; padding: 4px 9px; border-radius: 5px; margin-top: 8px; }
+  .agree.same { background: #1f3328; color: var(--ok); } .agree.diff { background: #33290f; color: var(--gold); }
+  .verdict { display: inline-block; font-weight: 700; padding: 8px 14px; border-radius: 6px; font-size: 15px; }
+  .v-ok { background: #1f3328; color: var(--ok); } .v-verify { background: #3a2f12; color: var(--gold); } .v-hold { background: var(--red); color: #fff; }
+  .why { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+  .truth { margin-top: 8px; font-size: 13px; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; margin-top: 8px; }
+  .metrics div { background: var(--ink-3); border-radius: 7px; padding: 8px 10px; }
+  .metrics small { display: block; font-size: 10.5px; color: var(--muted); } .metrics b { font-size: 17px; }
+  .metrics .alarm { background: var(--red-deep); }
+  .logline { font-family: var(--mono); font-size: 11px; color: #d9cfbf; margin-top: 8px; word-break: break-all; }
+
+  /* Canlı risk göstergesi (sahne 2: sinyaller tıklandıkça düşer) */
+  .gauge { background: var(--ink-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; transition: border-color .4s, box-shadow .4s; }
+  .gauge.mid { border-color: var(--gold); }
+  .gauge.high { border-color: var(--red); animation: alarmGlow 1.6s ease-in-out infinite; }
+  @keyframes alarmGlow { 50% { box-shadow: 0 0 0 4px #f0475e33; } }
+  .g-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .g-top small { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; }
+  .tier { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: #1f3328; color: var(--ok); transition: background .3s, color .3s; }
+  .tier.mid { background: #3a2f12; color: var(--gold); } .tier.high { background: var(--red); color: #fff; }
+  .tier.bump { animation: bump .45s ease; } @keyframes bump { 40% { transform: scale(1.18); } }
+  .g-num { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+  .g-num b { font-family: var(--serif); font-size: 46px; line-height: 1; transition: color .3s; }
+  .gauge.mid .g-num b { color: var(--gold); } .gauge.high .g-num b { color: var(--red); }
+  .g-num span { color: var(--muted); font-size: 13px; }
+  .g-bar i { transition: width .6s cubic-bezier(.2,.7,.2,1), background .3s; }
+  .g-sigs { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .g-sigs li { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--ink-3); border-radius: 7px; padding: 7px 10px; font-size: 13px; }
+  .g-sigs li small { display: block; color: var(--muted); font-size: 11.5px; }
+  .g-sigs li b { font-family: var(--mono); color: var(--red); white-space: nowrap; }
+  .g-sigs li.pop { animation: sigIn .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes sigIn { 0% { opacity: 0; transform: translateX(-14px); background: #4a2a2e; } 100% { opacity: 1; transform: none; } }
+  .g-sigs li.g-empty { color: var(--muted); background: none; padding: 2px 0; }
+  .panel-off { display: none; background: var(--ink-2); border: 1px dashed var(--line); border-radius: 12px; padding: 22px; color: var(--muted); }
+  .panel-off b { color: var(--paper); font-size: 16px; }
+  .panel.off > :not(.panel-off) { display: none; }
+  .panel.off .panel-off { display: block; }
+  /* Sahne 1 (korumasız): risk paneli yok, telefon ekranın ortasında */
+  .layout.solo { grid-template-columns: 1fr; }
+  .layout.solo .panel, .layout.solo .sre { display: none; }
+  body.solo > header { display: none; }
+  .layout.solo .left { justify-self: center; animation: centerIn .45s cubic-bezier(.2,.8,.2,1); }
+  @keyframes centerIn { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+  .simbar .row.mode { margin-bottom: 6px; }
+  .simbar .sbtn { font-size: 12px; padding: 6px 9px; }
+  .simbar .row.mode .sbtn { flex: 1; }
+  #modeOff[aria-pressed="true"] { background: #4a4440; border-color: #6b625b; }
+  #modeOn[aria-pressed="true"] { background: #1f6b46; border-color: #2a8a5b; }
+
+  /* ---------- En sağ: SRE paneli (bütün işlemler) ---------- */
+  .sre { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 6px; }
+  .sre h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 4px; }
+  .sre .lead { color: var(--muted); margin: 0 0 12px; font-size: 13.5px; }
+  .sre h3 { font-size: 13.5px; margin: 16px 0 8px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .sre h3 span { font-family: var(--mono); font-size: 10.5px; color: var(--muted); font-weight: 400; }
+  .sre-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .sre-actions .sbtn:disabled { opacity: .5; cursor: wait; }
+  .sre-alarm { display: none; background: var(--red-deep); color: #fff; border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: 13.5px; margin-bottom: 12px; animation: alarmGlow 1.6s ease-in-out infinite; }
+  .sre-alarm.on { display: block; }
+  .sre-alarm small { display: block; font-weight: 400; opacity: .9; font-size: 12px; margin-top: 2px; }
+  .sre .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 0; }
+  .metrics b.bump { animation: bump .45s ease; display: inline-block; }
+  .sre-mules, .sre-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .sre-mules li { background: #2d1c1e; border: 1px solid var(--red-deep); border-radius: 8px; padding: 8px 10px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .sre-mules li.new { animation: sigIn .5s cubic-bezier(.2,.8,.2,1); }
+  .sre-mules li small { display: block; color: var(--muted); font-size: 11.5px; }
+  .sre-mules li .tag { font-family: var(--mono); font-size: 11px; background: var(--red); color: #fff; border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+  .sre-mules li.bildirim { background: #33290f; border-color: #6b5520; }
+  .sre-mules li.bildirim .tag { background: var(--gold); color: var(--ink); }
+  .sre-mules li.empty, .sre-timeline li.empty { background: none; border: 0; color: var(--muted); padding: 0; font-size: 13px; }
+  .sre-timeline li { font-size: 12.5px; padding-left: 16px; position: relative; line-height: 1.45; }
+  .sre-timeline li.new { animation: chipIn .4s ease; }
+  .sre-timeline li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .sre-timeline li.hold::before, .sre-timeline li.alarm::before { background: var(--red); }
+  .sre-timeline li.mule::before { background: var(--gold); } .sre-timeline li.auto::before { background: var(--ok); }
+  .sre-timeline li.empty::before { display: none; }
+  .sre-timeline time { font-family: var(--mono); color: var(--muted); margin-right: 6px; }
+  .sre-log { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .sre-log table { font-size: 12px; }
+  .sre-log th { text-align: left; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); font-size: 11px; }
+  .sre-log td { padding: 6px 8px; vertical-align: top; }
+  .sre-log td small { display: block; color: var(--muted); font-size: 10.5px; }
+  .sre-log tr.in td { animation: rowIn .6s ease; }
+  .sre-log tr.in.hold td { animation: rowInHold .9s ease; }
+  @keyframes rowIn { from { background: #3a2f12; } }
+  @keyframes rowInHold { from { background: #6a1f2b; } }
+  .dtag { font-family: var(--mono); font-size: 11px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+  .dtag.ok { background: #1f3328; color: var(--ok); } .dtag.verify { background: #3a2f12; color: var(--gold); } .dtag.hold { background: var(--red); color: #fff; }
+
+  .replay { background: var(--ink-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+  .replay .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .cm { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 16px; font-size: 12.5px; margin-top: 10px; color: var(--muted); }
+  .cm b { color: var(--paper); font-family: var(--mono); }
+  .src { font-size: 11.5px; color: var(--muted); margin-top: 14px; line-height: 1.5; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Uygulama · <em>risk motoru</em> · SRE paneli</h1>
+  <p>Solda müşterinin uygulaması, ortada tek işlem için risk motoru, sağda bütün işlemler için SRE paneli. Sahne akışı: docs/sahne-senaryosu.txt · modeller PaySim'de eğitildi · isimler kurgusal.</p>
+</header>
+
+<div class="layout">
+  <!-- ================= SOL: iPhone ================= -->
+  <div class="left">
+    <div class="simbar">
+      <div class="lbl">Sahne kontrolü (operatör)</div>
+      <div class="row mode" role="group" aria-label="Uygulama modu">
+        <button class="sbtn" id="modeOff" aria-pressed="false">Korumasız · Sahne 1</button>
+        <button class="sbtn" id="modeOn" aria-pressed="true">🛡 Korumalı · Sahne 2</button>
+      </div>
+      <div class="row">
+        <button class="sbtn" id="simCall">📞 Gelen arama</button>
+        <button class="sbtn" id="simRemote" aria-pressed="false">🖥 Uzaktan erişim</button>
+        <button class="sbtn" id="simReset">Sıfırla</button>
+      </div>
+    </div>
+
+    <div class="iphone" aria-label="iPhone çerçevesinde bankacılık uygulaması">
+      <div class="screen" id="screen">
+        <div class="island" id="island"><span class="dot"></span><span id="callTimer"></span></div>
+
+        <div class="ak-scroll" id="akScroll">
+          <div class="ak-top">
+            <div class="ak-status"><span id="clock">9:41</span><span aria-hidden="true">5G ▮</span></div>
+            <div class="ak-share" id="sharePill">● Ekranın paylaşılıyor</div>
+            <div class="ak-welcome">
+              <div class="ak-avatar" aria-hidden="true" data-brand="initial">A</div>
+              <div><strong>Merhaba</strong><span id="custId"></span></div>
+              <button type="button" class="ak-help prot-only" data-go="safe" aria-label="Güvenli An bilgisi">♧</button>
+              <span class="ak-user" aria-hidden="true">M</span>
+            </div>
+            <div class="ak-topline"><span data-brand="upper">AKBANK</span><span class="ak-demo">KONSEPT DEMO</span></div>
+
+            <div class="ak-intro" id="hdrHome">
+              <div class="ak-segments" aria-label="Hesap görünümü"><button type="button" class="selected">Genel bakış</button><button type="button" data-go="home">Hesaplar</button><span>Kartlar</span><span>Yatırımlar</span></div>
+              <p>GÜNCEL BAKİYE</p>
+              <strong id="bal"></strong>
+              <span class="ak-acct-type">Vadesiz TL hesabım ⌄</span>
+              <div class="ak-shortcuts">
+                <button type="button" data-go="send"><i>↗</i>Para gönder</button>
+                <button type="button" data-go="home"><i>▤</i>Hesabım</button>
+                <button type="button" class="prot-only" data-go="safe"><i>✓</i>Güvenli An</button>
+              </div>
+            </div>
+            <div class="ak-title hidden" id="hdrInner"><button type="button" data-go="home" aria-label="Ana sayfaya dön">‹</button><strong id="hdrTitle">Para transferi</strong><span aria-hidden="true">↗</span></div>
+          </div>
+
+          <!-- Ana sayfa -->
+          <div class="view on" id="v-home">
+            <div class="ak-home">
+              <div class="ak-search"><span aria-hidden="true">⌕</span> İşlemlerini kolayca bul</div>
+              <div class="ak-heading"><strong>Hesaplarım ve kartlarım</strong><span>DEMO VERİ</span></div>
+              <div class="ak-cards">
+                <button type="button" class="ak-acard" data-go="send"><div><i data-brand="initial">A</i><strong>TL hesabım</strong><span>•••</span></div><small id="acctNo"></small><em>Kullanılabilir bakiye</em><b id="cardBal"></b><small>Vadesiz hesap</small></button>
+                <div class="ak-mini"><span class="ak-wing">◆</span><strong>Demo kartım</strong><span>•••• 2026</span><small>Yalnızca görsel örnek</small><b>Kart</b></div>
+              </div>
+              <button type="button" class="ak-banner prot-only" data-go="safe"><span class="ak-shield">✓</span><span><strong>Transferden önce bir güvenli an.</strong><small>Paranı göndermeden birlikte kontrol edelim.</small></span><b>›</b></button>
+              <div class="ak-heading" style="margin-top:16px"><strong>Son işlemler</strong><span>BU OTURUM</span></div>
+              <div id="txList"></div>
+              <button type="button" class="ak-primary ak-home-send" data-go="send">Para gönder <span>→</span></button>
+              <p class="ak-foot">Yarışma prototipi · Gerçek bankacılık işlemi yapılmaz.</p>
+            </div>
+          </div>
+
+          <!-- 1 Bilgiler: para transferi -->
+          <div class="view" id="v-send">
+            <div class="ak-body">
+              <div class="ak-steps" data-step="1"></div>
+              <label for="to">Kime göndermek istersin?</label>
+              <select id="to"></select>
+              <div class="ak-iban" id="ibanLabel"></div>
+              <label for="amount">Ne kadar göndermek istersin?</label>
+              <div class="ak-amount"><input id="amount" type="number" min="1" inputmode="decimal" placeholder="0"><span>TL</span></div>
+              <div class="ak-chips"><button type="button" data-amt="5000">5.000</button><button type="button" data-amt="85000">85.000</button><button type="button" data-amt="all">Tüm bakiye</button></div>
+              <p class="ak-hint" id="ratioLabel"></p>
+              <label for="desc">Açıklama</label>
+              <input id="desc" type="text" maxlength="40" placeholder="Örn. kira">
+              <div class="ak-source"><div class="ak-src-icon" data-brand="initial">A</div><div><strong>TL hesabım</strong><small>Kullanılabilir bakiye</small></div><b id="srcBal"></b></div>
+              <button type="button" class="ak-primary" id="sendBtn">Gönder →</button>
+              <div class="ak-protected prot-only"><span>✓</span> Güvenli An kontrolüyle korunuyor</div>
+              <p class="ak-foot">Konsept demo · Gerçek para gönderilmez.</p>
+            </div>
+          </div>
+
+          <!-- 2 Güvenlik: ek doğrulama (model ipucu, kural eşiği altında) -->
+          <div class="view" id="v-verify">
+            <div class="ak-body">
+              <div class="ak-steps" data-step="2"></div>
+              <div class="ak-icon warn">?</div>
+              <h2>İki kısa kontrol.</h2>
+              <p class="ak-text">Bu işlem alışılmadık göründüğü için soruyoruz. Banka seni arayıp “güvenli hesaba” para aktarmanı asla istemez.</p>
+              <div class="ak-details" id="verifyDetails"></div>
+              <ul class="ak-why" id="verifyWhy"></ul>
+              <div class="ak-questions">
+                <label for="qSafe">Birisi paranı “güvenli hesaba” taşımanı istedi mi?</label>
+                <select id="qSafe"><option value="">Yanıt seç</option><option value="yes">Evet</option><option value="no">Hayır</option><option value="unsure">Emin değilim</option></select>
+                <label for="qPressure">Hemen yapman veya kimseye söylememen istendi mi?</label>
+                <select id="qPressure"><option value="">Yanıt seç</option><option value="yes">Evet</option><option value="no">Hayır</option><option value="unsure">Emin değilim</option></select>
+              </div>
+              <div class="ak-error" id="qError" role="alert"></div>
+              <button type="button" class="ak-primary" id="verifyGo">Yanıtları değerlendir</button>
+              <button type="button" class="ak-secondary" id="verifyCancel">Transferden vazgeç</button>
+            </div>
+          </div>
+
+          <!-- 3 Onay: gönderildi -->
+          <div class="view" id="v-ok">
+            <div class="ak-body ak-done">
+              <div class="ak-steps prot-only" data-step="4"></div>
+              <svg class="ak-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M14 27 l8 8 l16 -17"/></svg>
+              <h2 id="okTitle">İşlem başarılı.</h2>
+              <p class="ak-text" id="okText"></p>
+              <div class="ak-details" id="okDetails"></div>
+              <button type="button" class="ak-primary" data-go="home">Ana sayfa</button>
+            </div>
+          </div>
+
+          <!-- Güvenli An bilgisi -->
+          <div class="view" id="v-safe">
+            <div class="ak-body">
+              <div class="ak-icon">✓</div>
+              <div class="ak-eyebrow">Güvenli An · Konsept</div>
+              <h2>Paranı göndermeden, birlikte kontrol edelim.</h2>
+              <p class="ak-text">Yeni alıcı, tutar, bakiye oranı, telefon görüşmesi ve ekran paylaşımı birlikte değerlendirilir. Görüşmen dinlenmez; yalnızca görüşme var mı bilgisi kullanılır.</p>
+              <div class="ak-details"><div class="ak-row"><span>Telefon görüşmesi</span><strong id="safeCall">Yok</strong></div><div class="ak-row"><span>Ekran paylaşımı</span><strong id="safeRemote">Kapalı</strong></div></div>
+              <p class="ak-text" style="margin-top:12px">Maliye, savcılık, polis veya banka sizden telefonla asla para transferi istemez. Konsept demo: gerçek hesap ve işlem yoktur.</p>
+              <button type="button" class="ak-primary" data-go="send">Transfer ekranına geç</button>
+            </div>
+          </div>
+        </div>
+
+        <nav class="ak-nav" aria-label="Mobil uygulama menüsü">
+          <button type="button" data-go="home" data-nav="home" class="selected"><span>⌂</span>Ana sayfa</button>
+          <button type="button" data-go="send" data-nav="send"><span>⇄</span>Transfer ve ödemeler</button>
+          <button type="button" class="prot-only" data-go="safe" data-nav="safe"><span>◇</span>Güvenli An</button>
+        </nav>
+
+        <!-- Giriş -->
+        <div class="ak-overlay ak-login on" id="loginUi">
+          <div class="ak-login-brand" data-brand="upper">AKBANK</div>
+          <div class="ak-login-hi">Hoş geldin</div>
+          <button type="button" class="ak-face" id="loginBtn" aria-label="Giriş yap">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 20V12a4 4 0 0 1 4-4h8M44 8h8a4 4 0 0 1 4 4v8M56 44v8a4 4 0 0 1-4 4h-8M20 56h-8a4 4 0 0 1-4-4v-8"/><path d="M24 24v5M40 24v5M32 26v10h-3M24 42c4 4 12 4 16 0"/></svg>
+            <i class="ring"></i>
+          </button>
+          <div class="ak-login-cta" id="loginCta">Giriş yapmak için dokun</div>
+          <small>Konsept demo · şifre istenmez, gerçek hesap yok</small>
+        </div>
+
+        <!-- Güvenli An kontrol ediyor / işlem yapılıyor -->
+        <div class="ak-overlay ak-proc" id="procUi">
+          <div class="ak-spinner"><span>✓</span></div>
+          <b id="procText">Güvenli An kontrol ediyor…</b>
+          <small id="procSub">Sinyaller birlikte değerlendiriliyor</small>
+        </div>
+
+        <!-- Tek soru (kural eşiği aşıldığında da sorulur; cevap kararı değiştirmez) -->
+        <div class="ak-overlay ak-sheetwrap" id="askUi">
+          <div class="ak-sheet">
+            <div class="ak-grab"></div>
+            <div class="ak-icon warn">?</div>
+            <h3>Göndermeden önce bir soru</h3>
+            <p>Birisi sizi bir yatırım fonuna veya “güvenli hesaba” para aktarmaya yönlendirdi mi?</p>
+            <div class="ak-yesno"><button type="button" class="ak-secondary" data-ans="yes">Evet</button><button type="button" class="ak-secondary" data-ans="no">Hayır</button></div>
+            <small>Yanıtın yalnızca bu işlem için kullanılır.</small>
+          </div>
+        </div>
+
+        <!-- PARA GÖNDERİLMEDİ -->
+        <div class="ak-overlay ak-hold" id="holdUi" role="alertdialog" aria-labelledby="holdTitle">
+          <div class="ak-hold-icon"><span>✋</span></div>
+          <h2 id="holdTitle">PARA GÖNDERİLMEDİ</h2>
+          <p>Bu işlemde birden fazla dolandırıcılık işareti var.<br><b>Telefondaki görüşmeyi HEMEN kapatın.</b></p>
+          <div class="ak-hold-card">Maliye, savcılık, polis veya banka sizden telefonla <b>ASLA</b> para transferi istemez.</div>
+          <ul class="ak-hold-why" id="holdWhy"></ul>
+          <button type="button" class="ak-hold-btn" id="callBankBtn">Görüşmeyi kapattım, Bankamı ara</button>
+          <small>Paranız hesabınızda · konsept demo</small>
+        </div>
+
+        <!-- Bankamı ara: uygulama içinden doğrulanmış arama -->
+        <div class="ak-overlay ak-bank" id="bankUi">
+          <div class="ak-bank-avatar"><i></i><i></i><span data-brand="initial">A</span></div>
+          <div class="who"><span data-brand="name">Akbank</span> Güvenlik Hattı</div>
+          <div class="ak-verified">✓ Uygulama içinden doğrulanmış arama</div>
+          <div class="ak-bank-status" id="bankStatus">Aranıyor<span class="dots"></span></div>
+          <div class="ak-incident" id="incident"></div>
+          <div class="ak-bank-end"><button type="button" id="bankEnd" aria-label="Görüşmeyi bitir">✕</button><small>Görüşmeyi bitir</small></div>
+          <p class="foot">Demo: gerçek arama başlatılmaz.</p>
+        </div>
+
+        <!-- Gelen arama -->
+        <div class="callui" id="callUi">
+          <div class="who">Bilinmeyen Numara</div>
+          <div class="num">+90 xxx xxx xx xx</div>
+          <div class="tag">Kendini “Maliye'den” biri olarak tanıtıyor</div>
+          <div class="btns">
+            <div><button style="background:#ff3b30" id="callDecline">✕</button><small>Reddet</small></div>
+            <div><button style="background:#34c759" id="callAccept">✆</button><small>Kabul et</small></div>
+          </div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SAĞ: algoritma ================= -->
+  <div class="panel">
+    <h2>Risk motoru</h2>
+    <p class="lead">Üç seviye aynı anda puanlar, karar <b>sıralı</b> verilir: kurallar durdurur (eşik 70), lojistik regresyon <b>ek doğrulama</b> ister, gradient boosting <b>gölge modda</b> puanlar ama karara etki etmez.</p>
+
+    <div class="panel-off"><b>Korumasız mod · Sahne 1</b><p>Risk motoru devre dışı: uygulama işlemi doğrudan gönderir. Sahne 2 için “Korumalı mod”u seçin.</p></div>
+
+    <div class="gauge" id="gauge">
+      <div class="g-top"><small>Canlı risk puanı · v1 kuralları</small><span class="tier" id="gTier">Düşük risk</span></div>
+      <div class="g-num"><b id="gScore">0</b><span>/ eşik 70</span></div>
+      <div class="scorebar g-bar"><i id="gFill"></i><span class="thr" style="left:70%"></span></div>
+      <ul class="g-sigs" id="gSigs"><li class="g-empty">Henüz sinyal yok</li></ul>
+    </div>
+
+    <div class="live">
+      <div class="chip" id="cCall"><small>Aktif çağrı</small><b>Yok</b></div>
+      <div class="chip" id="cRemote"><small>Uzaktan erişim</small><b>Kapalı</b></div>
+      <div class="chip" id="cTo"><small>Alıcı</small><b>-</b></div>
+      <div class="chip" id="cAmt"><small>Tutar / bakiye</small><b>-</b></div>
+    </div>
+    <div class="feed" id="feed" aria-live="polite"></div>
+
+    <div class="replay">
+      <h3 style="margin:0 0 8px;font-size:14px">Veri setinden oynat <span style="color:var(--muted);font-weight:400">· PaySim test döneminden gerçek etiketli işlemler</span></h3>
+      <div class="row">
+        <button class="sbtn" id="rpNormal">Normal işlem</button>
+        <button class="sbtn" id="rpFraud">Fraud işlemi</button>
+        <button class="sbtn primary" id="rpAuto">▶ Otomatik oynat</button>
+      </div>
+      <div class="cm" id="cm"></div>
+    </div>
+
+    <div class="pipeline">
+      <div class="stage" id="s1"><h3><span>1</span>Olay alındı</h3><div class="body"><div class="empty">Telefondan para gönderin ya da veri setinden bir işlem oynatın.</div></div></div>
+      <div class="stage" id="s2"><h3><span>2</span>Özellik çıkarımı</h3><div class="body"></div></div>
+      <div class="stage" id="s3"><h3><span>3</span>Seviye 1 · kurallar (karar verir)</h3><div class="body"></div></div>
+      <div class="stage" id="s4"><h3><span>4</span>Seviye 2 · lojistik regresyon (ipucu verir)</h3><div class="body"></div></div>
+      <div class="stage" id="s4g"><h3><span>5</span>Seviye 3 · gradient boosting (gölge mod)</h3><div class="body"></div></div>
+      <div class="stage" id="s5"><h3><span>6</span>Karar tablosu (sıralı)</h3><div class="body"></div></div>
+      <div class="stage" id="s6"><h3><span>7</span>SRE · log, metrik, alarm</h3><div class="body"></div></div>
+    </div>
+    <p class="src" id="src"></p>
+  </div>
+
+  <!-- ================= EN SAĞ: SRE paneli ================= -->
+  <div class="sre" id="sre">
+    <h2>SRE paneli</h2>
+    <p class="lead">Bütün işlemler aynı anda: log (4a), metrik (4b), alarm (4c), otomatik bekletme (3a) ve katır hesap tespiti. Telefondaki işlem burada tek bir satır.</p>
+    <div class="sre-actions">
+      <button class="sbtn primary" id="sreAttack">⚡ Saldırı simüle et (8 kurban)</button>
+      <button class="sbtn" id="sreTraffic" aria-pressed="false">▶ Canlı trafik</button>
+      <button class="sbtn" id="sreReset">Sıfırla</button>
+    </div>
+    <div class="sre-alarm" id="sreAlarm" role="alert"></div>
+    <div class="metrics">
+      <div><small>Toplam işlem</small><b id="kTotal">0</b></div>
+      <div><small>HOLD (3a)</small><b id="kHold">0</b></div>
+      <div><small>Ek doğrulama</small><b id="kVerify">0</b></div>
+      <div id="kRatioBox"><small>Riskli oran · alarm %2</small><b id="kRatio">%0</b></div>
+      <div><small>Bekletilen tutar · simülasyon</small><b id="kHeld">₺0</b></div>
+      <div><small>Gölge model uyuşmazlığı</small><b id="kShadow">0</b></div>
+    </div>
+    <h3>Katır hesap tespiti <span>30 dk'da ≥ 4 yeni gönderici</span></h3>
+    <ul class="sre-mules" id="sreMules"></ul>
+    <h3>Olay zaman çizelgesi <span>postmortem için</span></h3>
+    <ol class="sre-timeline" id="sreTimeline"></ol>
+    <h3>4a · İşlem logu <span>son 12 işlem</span></h3>
+    <div class="sre-log"><table><thead><tr><th>Saat</th><th>İşlem</th><th>Tutar</th><th>Skor</th><th>Karar</th></tr></thead><tbody id="sreLog"></tbody></table></div>
+    <p class="src">Arka plan trafiği PaySim'deki 140 normal işlemden gelir; saldırı dalgası ve isimler kurgusaldır. Tutarlar simülasyondur, gerçek banka metriği değildir.</p>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(() => {
+  const D = window.APP_DATA;
+  if (!D) { document.body.innerHTML = "<p style='padding:30px'>data.js bulunamadı. Önce <code>python demo/export_app_data.py</code> çalıştırın.</p>"; return; }
+  const M = D.model, $ = id => document.getElementById(id);
+  const tl = n => "₺" + Math.round(n).toLocaleString("tr-TR");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+
+  // ---- Müşteri ve alıcılar (docs/sahne-senaryosu.txt: bakiye 100.000 TL, normal transfer 5.000 TL) ----
+  // Kayıtlı alıcıların hesap geçmişi PaySim'deki normal işlemlerden alınır; modeller PaySim'de eğitilmiştir.
+  const normals = D.sample.filter(r => !r.isFraud).sort((a, b) => b.balance - a.balance);
+  const me = { id: "OB-0042", balance: 100000, start: 100000, normal: 5000 };
+  const payees = [
+    { id: "Deniz Yılmaz", name: "Deniz Yılmaz · kayıtlı alıcı", iban: "0001", destBalance: normals[1].destBalance, prior: Math.max(1, normals[1].destPrior), sameHour: 1, known: true },
+    { id: "Ece Kaya", name: "Ece Kaya · kayıtlı alıcı", iban: "0002", destBalance: normals[2].destBalance, prior: Math.max(1, normals[2].destPrior), sameHour: 1, known: true },
+    { id: "Kalkınma Fonu Tahsilat", name: "Kalkınma Fonu Tahsilat", iban: "0003", destBalance: 0, prior: 0, sameHour: 1, known: false },
+  ];
+  const payee = () => payees[$("to").value === "" ? -1 : +$("to").value];
+  $("acctNo").textContent = "Demo hesap · " + me.id;
+  $("to").innerHTML = `<option value="">Alıcı seç</option>` + payees.map((p, i) => `<option value="${i}">${p.name}</option>`).join("");
+  $("src").textContent = `Kaynak: ${D.source}. Model: ${M.trainRows.toLocaleString("tr-TR")} işlemle eğitildi; test döneminde AUC ${M.testAuc}, %0,5 yanlış alarmda yakalama %${Math.round(M.testRecall * 100)}. Gradient boosting (gölge): ${D.gb.trees.length} ağaç, %50 eşikte yakalama %${(D.gb.testRecall * 100).toFixed(1).replace(".", ",")}. PaySim'de fraud'ların çoğu tüm bakiyeyi gönderdiği için bu sonuç gerçek dünyaya göre iyimserdir. Sahne verisi (bakiye, alıcılar, isimler) kurgusaldır.`;
+
+  // ---- Durum ----
+  const st = { mode: "protected", loggedIn: false, call: false, remote: false, callStart: 0, bankCall: false, bankStart: 0, tx: [],
+    counts: { total: 0, hold: 0, verify: 0, ok: 0 }, cm: { tp: 0, fp: 0, fn: 0, tn: 0 }, busy: false, pending: null, shownScore: 0, sigOn: new Set(), incident: 41 };
+  const tl2 = n => n.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+  const protectedMode = () => st.mode === "protected";
+
+  // ---- Telefon gezinme ----
+  const TITLES = { send: "Para transferi", verify: "Güvenlik kontrolü", ok: "Transfer sonucu", safe: "Güvenli An" };
+  const NAV = { home: "home", send: "send", verify: "send", ok: "send", safe: "safe" };
+  const show = v => {
+    document.querySelectorAll(".screen .view").forEach(x => x.classList.toggle("on", x.id === "v-" + v));
+    const home = v === "home";
+    $("hdrHome").classList.toggle("hidden", !home); $("hdrInner").classList.toggle("hidden", home);
+    if (!home) $("hdrTitle").textContent = TITLES[v];
+    document.querySelectorAll(".ak-nav button").forEach(b => b.classList.toggle("selected", b.dataset.nav === NAV[v]));
+    $("akScroll").scrollTop = 0;
+  };
+  const overlay = (id, on) => $(id).classList.toggle("on", on);
+  document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => {
+    const v = b.dataset.go;
+    st.pending = null;
+    show(v);
+    if (v === "send") log("Para gönder ekranı açıldı");
+    if (v === "safe") log("Güvenli An bilgisi açıldı");
+  });
+  // Adım çizgisi: 1 Bilgiler · 2 Güvenlik · 3 Onay
+  document.querySelectorAll(".ak-steps").forEach(el => {
+    const cur = +el.dataset.step;
+    el.innerHTML = ["Bilgiler", "Güvenlik", "Onay"].map((n, i) => `<span class="ak-step ${i + 1 === cur ? "current" : i + 1 < cur ? "done" : ""}">${i + 1} <b>${n}</b></span>`).join("<i></i>");
+  });
+  const renderBal = () => { ["bal", "cardBal", "srcBal"].forEach(id => $(id).textContent = tl(me.balance)); updateLive(); };
+  // Bakiye geri sayımı (Sahne 1: 100.000 → 15.000)
+  function animateBal(from, to) {
+    const t0 = performance.now(), dur = reduce ? 0 : 900;
+    $("bal").classList.remove("tick"); void $("bal").offsetWidth; $("bal").classList.add("tick");
+    const step = now => {
+      const p = dur ? Math.min((now - t0) / dur, 1) : 1, v = from + (to - from) * (1 - Math.pow(1 - p, 3));
+      ["bal", "cardBal", "srcBal"].forEach(id => $(id).textContent = tl(v));
+      if (p < 1) requestAnimationFrame(step); else renderBal();
+    };
+    requestAnimationFrame(step);
+    setTimeout(renderBal, dur + 300);  // animasyon kareleri durursa son bakiye yine yazılsın
+  }
+  setInterval(() => {
+    const d = new Date(); $("clock").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+    const start = st.bankCall ? st.bankStart : st.call ? st.callStart : 0;
+    if (start) { const s = Math.floor((Date.now() - start) / 1000); $("callTimer").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; }
+  }, 1000);
+
+  // ---- Canlı sinyaller + olay akışı ----
+  function log(msg, kv) {
+    const t = new Date().toLocaleTimeString("tr-TR");
+    const div = document.createElement("div"); div.className = "new";
+    div.innerHTML = `${t} · ${msg}${kv ? ` → <b>${kv}</b>` : ""}`;
+    $("feed").prepend(div);
+  }
+  function chip(id, val, hot) { const c = $(id); c.querySelector("b").textContent = val; c.classList.toggle("hot", !!hot); }
+  // Canlı risk puanı: v1 kurallarıyla aynı ağırlıklar, işlem gönderilmeden önce tıklandıkça güncellenir
+  function liveSignals() {
+    const p = payee(), amt = parseFloat($("amount").value) || 0, ratio = amt / me.balance, mult = amt / me.normal;
+    return [
+      { k: "call", on: st.call && st.loggedIn, pts: 25, label: "Arama süreci aktif", sub: "müşteri bankacılık uygulamasını görüşme sırasında açtı" },
+      { k: "new", on: !!p && !p.known, pts: 30, label: "Yeni alıcı", sub: p ? `${p.id} hesabına daha önce para gönderilmemiş` : "" },
+      { k: "amt", on: amt >= 20000, pts: 25, label: "Yüksek tutar", sub: `bakiyenin %${Math.round(ratio * 100)}’i · normal tutarın ${+mult.toFixed(1)} katı` },
+      { k: "remote", on: st.remote, pts: 20, label: "Uzaktan erişim", sub: "ekran başka bir cihazla paylaşılıyor" },
+    ];
+  }
+  function renderGauge() {
+    const sigs = liveSignals(), on = sigs.filter(s => s.on), score = on.reduce((a, s) => a + s.pts, 0);
+    const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
+    const g = $("gauge"), pill = $("gTier");
+    const prevTier = g.dataset.tier || "low";
+    g.classList.toggle("mid", tier === "mid"); g.classList.toggle("high", tier === "high"); g.dataset.tier = tier;
+    pill.className = "tier " + (tier === "low" ? "" : tier);
+    pill.textContent = { low: "Düşük risk", mid: "Orta risk", high: "Yüksek risk · eşik aşıldı" }[tier];
+    if (prevTier !== tier) { void pill.offsetWidth; pill.classList.add("bump"); }
+    $("gFill").style.width = Math.min(score / 100, 1) * 100 + "%";
+    $("gFill").style.background = tier === "high" ? "var(--red)" : tier === "mid" ? "var(--gold)" : "var(--ok)";
+    const fresh = on.filter(s => !st.sigOn.has(s.k));
+    $("gSigs").innerHTML = on.length ? on.map(s => `<li class="${fresh.includes(s) ? "pop" : ""}"><span>${s.label}<small>${s.sub}</small></span><b>+${s.pts}</b></li>`).join("") : `<li class="g-empty">Henüz sinyal yok</li>`;
+    if (protectedMode()) fresh.forEach(s => log("Canlı sinyal: " + s.label, `+${s.pts} → puan ${score}`));
+    if (protectedMode() && prevTier !== "high" && tier === "high") log("Eşik aşıldı", `puan ${score} ≥ 70`);
+    st.sigOn = new Set(on.map(s => s.k));
+    const from = st.shownScore, t0 = performance.now();
+    const step = now => { const p = reduce ? 1 : Math.min((now - t0) / 500, 1); $("gScore").textContent = Math.round(from + (score - from) * p); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); st.shownScore = score;
+    setTimeout(() => { if (st.shownScore === score) $("gScore").textContent = score; }, 700);  // sekme arka plandaysa animasyon kareleri durur
+  }
+  function updateLive() {
+    const p = payee(), amt = parseFloat($("amount").value) || 0;
+    chip("cCall", st.call ? "Var" : "Yok", st.call);
+    chip("cRemote", st.remote ? "Açık" : "Kapalı", st.remote);
+    chip("cTo", !p ? "-" : p.known ? "Kayıtlı" : "Yeni alıcı", p && !p.known);
+    chip("cAmt", amt ? "%" + Math.round(amt / me.balance * 100) : "-", amt >= 20000);
+    $("ratioLabel").textContent = amt > 0 ? `Bakiyenin %${Math.round(amt / me.balance * 100)}’i · Normal tutarın ${+(amt / me.normal).toFixed(1)} katı` : "Normal transfer tutarın: " + tl(me.normal);
+    $("ibanLabel").textContent = p ? `TR•• DEMO ${p.iban} · Gerçek IBAN değildir` : "";
+    $("safeCall").textContent = st.call ? "Var" : "Yok"; $("safeRemote").textContent = st.remote ? "Açık" : "Kapalı";
+    renderGauge();
+  }
+  $("to").onchange = () => { const p = payee(); if (p) log("Alıcı seçildi: " + p.id, p.known ? "kayıtlı alıcı" : "yeni_alici=true"); updateLive(); };
+  $("amount").oninput = updateLive;
+  $("amount").onchange = () => { const a = +$("amount").value; if (a) log("Tutar girildi: " + tl(a)); };
+  $("desc").onchange = () => { if ($("desc").value) log(`Açıklama: “${$("desc").value}”`, "puanlanmaz"); };
+  document.querySelectorAll("[data-amt]").forEach(b => b.onclick = () => {
+    $("amount").value = b.dataset.amt === "all" ? me.balance : b.dataset.amt;
+    log("Tutar seçildi: " + tl(+$("amount").value)); updateLive();
+  });
+
+  // ---- Giriş (şifre yok; Face ID tarzı animasyon) ----
+  $("loginBtn").onclick = async () => {
+    if (st.loggedIn || $("loginBtn").classList.contains("scan")) return;
+    $("loginBtn").classList.add("scan"); $("loginCta").textContent = "Doğrulanıyor…";
+    await wait(900);
+    $("loginBtn").classList.remove("scan"); $("loginBtn").classList.add("ok"); $("loginCta").textContent = "Giriş başarılı";
+    await wait(350);
+    $("loginUi").classList.add("out");
+    await wait(450);
+    overlay("loginUi", false); $("loginUi").classList.remove("out");
+    st.loggedIn = true;
+    log("Uygulamaya giriş yapıldı" + (st.call ? " (aktif görüşme sırasında)" : ""), st.call ? "active_call=true" : null);
+    updateLive();
+  };
+  function resetLogin() {
+    st.loggedIn = false; overlay("loginUi", true);
+    $("loginBtn").classList.remove("scan", "ok"); $("loginCta").textContent = "Giriş yapmak için dokun";
+  }
+
+  // ---- Simülasyon: arama ve uzaktan erişim ----
+  $("simCall").onclick = () => {
+    if (st.call) { endCall(); return; }
+    $("callUi").classList.add("on"); log("Gelen arama: bilinmeyen numara");
+  };
+  $("callAccept").onclick = () => {
+    $("callUi").classList.remove("on"); st.call = true; st.callStart = Date.now();
+    $("island").classList.add("call"); $("simCall").setAttribute("aria-pressed", "true"); $("simCall").textContent = "📞 Aramayı bitir";
+    log("Arama kabul edildi", "active_call=true"); updateLive();
+  };
+  $("callDecline").onclick = () => { $("callUi").classList.remove("on"); log("Arama reddedildi", "active_call=false"); };
+  function endCall(note) {
+    if (!st.call) return;
+    st.call = false; if (!st.bankCall) { $("island").classList.remove("call"); $("callTimer").textContent = ""; }
+    $("simCall").setAttribute("aria-pressed", "false"); $("simCall").textContent = "📞 Gelen arama";
+    log(note || "Arama bitti", "active_call=false"); updateLive();
+  }
+  $("simRemote").onclick = () => {
+    st.remote = !st.remote; $("simRemote").setAttribute("aria-pressed", st.remote); $("sharePill").classList.toggle("on", st.remote);
+    log(st.remote ? "Uzaktan erişim uygulaması açıldı" : "Uzaktan erişim kapandı", "remote_access=" + st.remote); updateLive();
+  };
+  function resetDemo() {
+    endCall(); if (st.remote) $("simRemote").click();
+    ["procUi", "askUi", "holdUi", "bankUi"].forEach(id => overlay(id, false));
+    st.bankCall = false; $("island").classList.remove("call"); $("callTimer").textContent = ""; $("callUi").classList.remove("on");
+    me.balance = me.start; st.tx = []; st.pending = null;
+    $("to").value = ""; $("amount").value = ""; $("desc").value = "";
+    renderTx(); renderBal(); show("home"); resetLogin();
+  }
+  $("simReset").onclick = () => { resetDemo(); resetSre(); log("Demo sıfırlandı · bakiye " + tl(me.start)); };
+  function setMode(m) {
+    st.mode = m;
+    $("screen").classList.toggle("unprotected", m !== "protected");
+    // Sahne 1: Karabanka (korumasız, siyah) · Sahne 2: Akbank (korumalı, kırmızı)
+    st.brand = m === "protected" ? { name: "Akbank", upper: "AKBANK", initial: "A", prefix: "AK" } : { name: "Karabanka", upper: "KARABANKA", initial: "K", prefix: "KB" };
+    document.querySelectorAll("[data-brand]").forEach(el => el.textContent = st.brand[el.dataset.brand]);
+    $("custId").textContent = st.brand.name + " müşterisi";
+    document.title = st.brand.name + " · " + (m === "protected" ? "risk motoru · SRE paneli" : "uygulama");
+    document.querySelector(".panel").classList.toggle("off", m !== "protected");
+    document.querySelector(".layout").classList.toggle("solo", m !== "protected");
+    document.body.classList.toggle("solo", m !== "protected");
+    $("modeOn").setAttribute("aria-pressed", m === "protected"); $("modeOff").setAttribute("aria-pressed", m !== "protected");
+    resetDemo(); resetSre();
+    log(m === "protected" ? "KORUMALI MOD (Sahne 2): risk motoru açık" : "KORUMASIZ MOD (Sahne 1): risk motoru kapalı");
+  }
+  $("modeOn").onclick = () => setMode("protected");
+  $("modeOff").onclick = () => setMode("unprotected");
+
+  // ---- Risk motoru ----
+  function featuresOf(ev) {
+    const hour = ev.hour;
+    return {
+      log_tutar: Math.log1p(ev.amount),
+      log_tutar_orani: Math.log1p(ev.amount / (ev.balance + 1)),
+      tum_bakiye: ev.balance > 0 && Math.abs(ev.amount - ev.balance) < 0.005 ? 1 : 0,
+      alici_bos_hesap: ev.destBalance === 0 ? 1 : 0,
+      log_alici_onceki: Math.log1p(ev.destPrior),
+      gece: hour < 6 ? 1 : 0,
+    };
+  }
+  const RULES = [
+    ["Yeni alıcı", 30, ev => ev.newBeneficiary],
+    ["Yüksek tutar (≥ 20.000)", 25, ev => ev.amount >= 20000],
+    ["İşlem sırasında aktif çağrı", 25, ev => ev.activeCall],
+    ["Uzaktan erişim uygulaması", 20, ev => ev.remoteAccess],
+    ["Katır sinyali (≥ 4 farklı yeni gönderici)", 30, ev => ev.destSenders >= 4],
+  ];
+  function model(f) {
+    const parts = M.features.map((n, i) => { const z = (f[n] - M.mean[i]) / M.scale[i]; return { n, c: M.coef[i] * z }; });
+    const logit = M.intercept + parts.reduce((s, p) => s + p.c, 0);
+    return { parts, p: 1 / (1 + Math.exp(-logit)) };
+  }
+
+  // Seviye 3: PaySim'de eğitilmiş gradient boosting ağaçları (demo/export_app_data.py sklearn ile aynı sonucu doğrular)
+  const G = D.gb;
+  function gbProb(f) {
+    const x = G.features.map(n => f[n]);
+    let raw = G.baseline;
+    for (const t of G.trees) { let i = 0; while (!t.leaf[i]) i = x[t.f[i]] <= t.t[i] ? t.l[i] : t.r[i]; raw += t.v[i]; }
+    return 1 / (1 + Math.exp(-raw));
+  }
+  const pct = v => "%" + (v * 100).toFixed(1).replace(".", ",");
+
+  const stage = (n, html, active) => {
+    const s = $("s" + n); s.classList.add("on"); document.querySelectorAll(".stage").forEach(x => x.classList.remove("active"));
+    if (active !== false) s.classList.add("active"); s.querySelector(".body").innerHTML = html;
+    // Masaüstünde sadece panelin içi kayar, sayfa yerinde kalır; mobilde normal kaydırma
+    const panel = document.querySelector(".panel"), behavior = reduce ? "auto" : "smooth";
+    if (panel.scrollHeight > panel.clientHeight + 1) {
+      const r = s.getBoundingClientRect(), pr = panel.getBoundingClientRect();
+      if (r.bottom > pr.bottom) panel.scrollBy({ top: Math.min(r.bottom - pr.bottom + 12, r.top - pr.top - 8), behavior });
+      else if (r.top < pr.top) panel.scrollBy({ top: r.top - pr.top - 8, behavior });
+    } else s.scrollIntoView({ block: "nearest", behavior });
+    return s;
+  };
+  const resetStages = () => document.querySelectorAll(".stage").forEach((s, i) => { s.classList.remove("on", "active"); if (i) s.querySelector(".body").innerHTML = ""; });
+  const fmtF = (n, v) => n === "log_tutar" ? `${v.toFixed(2)} (≈${tl(Math.expm1(v))})` : n === "log_tutar_orani" ? `${v.toFixed(2)} (oran ${Math.expm1(v).toFixed(2)})` : n === "log_alici_onceki" ? `${v.toFixed(2)} (${Math.round(Math.expm1(v))} işlem)` : String(v);
+  const FNAME = { log_tutar: "Tutar (log)", log_tutar_orani: "Tutar / bakiye (log)", tum_bakiye: "Tüm bakiye", alici_bos_hesap: "Alıcı hesap boş", log_alici_onceki: "Alıcıya önceki işlem (log)", gece: "Gece (00-06)" };
+
+  async function evaluate(ev) {
+    st.busy = true; resetStages();
+    const sp = ms => wait(ms);
+    // 1 Olay
+    const evJson = { eventId: "evt-" + Date.now().toString(36), kaynak: ev.source, customerId: ev.from, beneficiaryId: ev.to, amountTry: +ev.amount.toFixed(2),
+      balanceTry: +ev.balance.toFixed(2), device: { activeCall: ev.activeCall ?? "veri setinde yok", remoteAccess: ev.remoteAccess ?? "veri setinde yok" } };
+    stage(1, `<pre class="json">${JSON.stringify(evJson, null, 2)}</pre>`); await sp(550);
+    // 2 Özellikler
+    const f = featuresOf(ev);
+    const half = Math.ceil(M.features.length / 2), tbl = list => `<table>${list.map(n => `<tr><td>${FNAME[n]}</td><td>${fmtF(n, f[n])}</td></tr>`).join("")}</table>`;
+    stage(2, `<div class="fgrid">${tbl(M.features.slice(0, half))}${tbl(M.features.slice(half))}</div>`); await sp(650);
+    // 3 Kurallar
+    const s3 = stage(3, `<table>${RULES.map(([nm, pt]) => `<tr class="rule"><td>${nm}</td><td></td></tr>`).join("")}</table>
+      <div class="scorebar"><i id="ruleFill"></i><span class="thr" style="left:${70 / 130 * 100}%"></span></div><div class="sb-legend"><span>skor <b id="ruleScore" style="color:var(--paper)">0</b></span><span>eşik 70</span><span>130</span></div>`);
+    let score = 0; const fired = [];
+    const rows = s3.querySelectorAll(".rule");
+    for (let i = 0; i < RULES.length; i++) {
+      const [nm, pt, fn] = RULES[i];
+      const raw = fn(ev), unknown = (i === 2 && ev.activeCall == null) || (i === 3 && ev.remoteAccess == null);
+      const hit = !!raw;
+      if (hit) { score += pt; fired.push(nm); }
+      rows[i].lastElementChild.innerHTML = unknown ? `<span class="na">veri yok</span>` : hit ? `<span class="yes">+${pt}</span>` : `<span class="no">0</span>`;
+      rows[i].classList.add("in");
+      $("ruleScore").textContent = score;
+      const fill = $("ruleFill"); fill.style.width = Math.min(score / 130, 1) * 100 + "%"; fill.style.background = score >= 70 ? "var(--red)" : score >= 40 ? "var(--gold)" : "var(--ok)";
+      await sp(320);
+    }
+    // 4 Model
+    const m = model(f), maxAbs = Math.max(1, ...m.parts.map(p => Math.abs(p.c)));
+    stage(4, `${m.parts.map(p => { const w = Math.abs(p.c) / maxAbs * 50; const col = p.c > 0 ? "var(--red)" : "var(--ok)";
+      return `<div class="contrib"><span>${FNAME[p.n]}</span><div class="track"><i style="background:${col};left:${p.c > 0 ? 50 : 50 - w}%;width:${w}%"></i></div><span class="v">${p.c >= 0 ? "+" : ""}${p.c.toFixed(2)}</span></div>`; }).join("")}
+      <div class="prob"><b>%${(m.p * 100).toFixed(1).replace(".", ",")}</b><span style="color:var(--muted)">fraud olasılığı · ek doğrulama eşiği %${(M.threshold * 100).toFixed(1).replace(".", ",")}</span></div>
+      <p class="why">Kırmızı çubuklar fraud'a, yeşiller normale iter (ağırlık × standart değer).</p>`); await sp(750);
+    // 5 Seviye 3: gölge mod (karara etki etmez)
+    const g = gbProb(f), lrFlag = m.p >= M.threshold, gbFlag = g >= G.threshold, agree = lrFlag === gbFlag;
+    stage("4g", `<div class="shadowbox"><b>${pct(g)}</b><span style="color:var(--muted)">fraud olasılığı · eşik ${pct(G.threshold)} · ${G.trees.length} ağaç</span></div>
+      <div class="scorebar"><i style="width:${g * 100}%;background:${gbFlag ? "var(--red)" : "var(--ok)"}"></i><span class="thr" style="left:${G.threshold * 100}%"></span></div>
+      <p class="why">Karar verseydi: <b style="color:var(--paper)">${gbFlag ? "ek doğrulama" : "onay"}</b>. Gölge modda sadece loglanır, karara etki etmez.</p>
+      <span class="agree ${agree ? "same" : "diff"}">${agree ? "✓ Lojistik regresyonla aynı fikirde" : "⚠ Lojistik regresyonla farklı: karşılaştırma için loglanır"}</span>`); await sp(650);
+
+    // 6 Karar tablosu: satırlar sırayla kontrol edilir, ilk tutan satır kararı verir
+    const decision = score >= 70 ? "hold" : lrFlag ? "verify" : "ok";
+    const hitRow = { hold: 1, verify: 2, ok: 4 }[decision];
+    const rowState = n => n < hitRow ? "pass" : n === hitRow ? "hit" : (n === 3 && decision === "verify") ? "next" : "skip";
+    const askNote = ev.source === "telefon" ? "telefonda sorulur" : "veri setinde müşteri yanıtı yok";
+    const table = [
+      [1, `Kural skoru ≥ 70 (skor ${score})`, "HOLD"],
+      [2, `Lojistik olasılık ≥ ${pct(M.threshold)} (${pct(m.p)})`, "Ek doğrulama"],
+      [3, `Müşteri “evet / emin değilim” der ya da çağrı sürer (${askNote})`, "HOLD"],
+      [4, "Diğer durumlar", "Onay"],
+    ].map(([n, cond, res]) => `<div class="${rowState(n)}"><span class="n">${n}</span><span>${cond}</span><span class="res">${res}</span></div>`).join("")
+      + `<div class="shadow"><span class="n">G</span><span>Gradient boosting ${pct(g)} (gölge mod)</span><span class="res">sadece log</span></div>`;
+    const reason = decision === "hold" ? `Satır 1 tuttu: ${fired.join(", ")}.${ev.source === "telefon" ? " Müşteriye yine de soru sorulur; cevap kararı değiştirmez, çünkü yönlendirilen müşteri “hayır” diyebilir." : ""}`
+      : decision === "verify" ? `Satır 1 tutmadı (skor ${score}). Satır 2 tuttu: model tek başına bekletmez, müşteriden ek doğrulama ister. Sıradaki adım satır 3.`
+      : "Satır 1 ve 2 tutmadı, satır 4 geçerli.";
+    const label = { hold: "HOLD: işlem bekletilir", verify: "Ek doğrulama istenir", ok: "Onay: işlem geçer" }[decision];
+    let truth = "";
+    if (ev.isFraud != null) {
+      const flagged = decision !== "ok";
+      const k = ev.isFraud ? (flagged ? "tp" : "fn") : (flagged ? "fp" : "tn"); st.cm[k]++;
+      if (gbFlag) { const gk = ev.isFraud ? "gbTp" : "gbFp"; st.cm[gk] = (st.cm[gk] || 0) + 1; }
+      truth = `<div class="truth">Veri setindeki gerçek etiket: <b style="color:${ev.isFraud ? "var(--red)" : "var(--ok)"}">${ev.isFraud ? "FRAUD" : "normal"}</b> · ${{ tp: "doğru yakalandı", fn: "kaçırıldı", fp: "yanlış alarm", tn: "doğru geçti" }[k]}</div>`;
+      renderCm();
+    }
+    stage(5, `<div class="dt">${table}</div><span class="verdict v-${decision}">${label}</span><p class="why">${reason}</p>${truth}`); await sp(500);
+    // 7 SRE: işlem sağdaki SRE paneline yazılır
+    const line = JSON.stringify({ ts: new Date().toISOString(), event: evJson.eventId, score, lrP: +m.p.toFixed(3), gbP_shadow: +g.toFixed(3), decision });
+    sreRecord(ev, { score, decision, p: m.p, g, agree });
+    const k = st.sre.k;
+    stage(6, `<div class="logline">${line}</div><p class="why">→ SRE paneline yazıldı (sağda): toplam ${k.total} işlem, riskli oran ${pct1((k.hold + k.verify) / k.total)}.</p>`, false);
+    st.busy = false; st.last = { score, p: m.p };
+    return decision;
+  }
+
+  function renderCm() {
+    const c = st.cm, n = c.tp + c.fp + c.fn + c.tn;
+    $("cm").innerHTML = n ? `<span>Oynatılan <b>${n}</b></span><span>Yakalanan fraud <b>${c.tp}/${c.tp + c.fn}</b></span><span>Yanlış alarm <b>${c.fp}</b></span><span>Doğru geçen <b>${c.tn}</b></span><span>Gölge GB yakalardı <b>${c.gbTp || 0}/${c.tp + c.fn}</b></span><span>Gölge GB yanlış alarm <b>${c.gbFp || 0}</b></span>` : "";
+  }
+
+  // ---- Telefondan gönderim (docs/sahne-senaryosu.txt) ----
+  function renderTx() {
+    const lbl = { hold: "Bekletildi", cancel: "İptal edildi" };
+    $("txList").innerHTML = st.tx.length ? st.tx.slice().reverse().map(t => `<div class="ak-tx"><span>${t.to}<small>${t.time} · ${t.label}</small></span><span class="${lbl[t.status] ? "hold" : "neg"}">${lbl[t.status] || "-" + tl(t.amount)}</span></div>`).join("")
+      : `<div class="ak-tx"><span>Henüz işlem yok<small>Para göndererek başla</small></span></div>`;
+  }
+  function settle(ev, status) {
+    const from = me.balance;
+    if (status === "ok") me.balance -= ev.amount;
+    st.tx.push({ ev, to: ev.to, amount: ev.amount, status, label: status === "hold" ? "güvenlik incelemesi" : ev.desc || "havale", time: new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) });
+    renderTx();
+    if (status === "ok") animateBal(from, me.balance); else renderBal();
+  }
+  const summary = ev => `<div class="ak-row"><span>Alıcı</span><strong>${ev.to}</strong></div><div class="ak-row"><span>Tutar</span><strong>${tl2(ev.amount)}</strong></div>`
+    + (ev.desc ? `<div class="ak-row"><span>Açıklama</span><strong>${ev.desc.replace(/[<>&]/g, "")}</strong></div>` : "")
+    + (st.last && ev.source === "telefon" && protectedMode() ? `<div class="ak-row"><span>Kural skoru</span><strong>${st.last.score} / eşik 70</strong></div><div class="ak-row"><span>Model olasılığı</span><strong>${pct(st.last.p)}</strong></div>` : "");
+  const reasonsOf = ev => [ev.activeCall && "Aktif telefon görüşmesi", ev.newBeneficiary && "Yeni alıcı", ev.amount >= 20000 && `Bakiyenin %${Math.round(ev.amount / ev.balance * 100)}’i`, ev.amount >= 20000 && `Normal tutarın ${+(ev.amount / me.normal).toFixed(0)} katı`, ev.remoteAccess && "Ekran paylaşımı", ev.coerced && "Yönlendirme bildirildi", ev.unsure && "Belirsiz yanıt"].filter(Boolean);
+  function showOk(ev, note) {
+    settle(ev, "ok");
+    $("okTitle").textContent = protectedMode() ? "Demo transferi tamamlandı." : "İşlem başarılı.";
+    $("okText").textContent = `${tl2(ev.amount)} gönderildi${note ? " (" + note + ")" : ""}.`;
+    $("okDetails").innerHTML = summary(ev); show("ok");
+  }
+  async function showHold(ev) {
+    settle(ev, "hold"); st.held = ev;
+    $("holdWhy").innerHTML = reasonsOf(ev).map((r, i) => `<li style="animation-delay:${0.5 + i * 0.12}s">${r}</li>`).join("");
+    overlay("holdUi", true);
+    log("PARA GÖNDERİLMEDİ ekranı gösterildi", "müşteriye görüşmeyi kapat uyarısı");
+  }
+  const sendEvent = () => {
+    const p = payee(), amount = parseFloat($("amount").value);
+    const ev = { source: "telefon", ts: Date.now(), from: me.id, to: p.id, amount, balance: me.balance, destBalance: p.destBalance, destPrior: p.prior,
+      newBeneficiary: !p.known, activeCall: st.call, remoteAccess: st.remote, hour: new Date().getHours(), isFraud: null, desc: $("desc").value.trim() };
+    ev.destSenders = fanInCount(ev);
+    return ev;
+  };
+  $("sendBtn").onclick = async () => {
+    if (st.busy) return;
+    const p = payee(), amount = parseFloat($("amount").value);
+    if (!p) { $("ratioLabel").textContent = "Önce alıcı seç."; return; }
+    if (!(amount > 0) || amount > me.balance + 0.005) { log("Geçersiz tutar veya yetersiz bakiye"); $("ratioLabel").textContent = "Tutar sıfırdan büyük olmalı ve bakiyeyi aşmamalı."; return; }
+    const ev = sendEvent();
+    log("Gönder'e basıldı: " + tl(amount) + " → " + p.id + (ev.desc ? ` · “${ev.desc}”` : ""));
+    if (!protectedMode()) {
+      // Sahne 1: korumasız uygulama, risk kontrolü yok
+      $("procText").textContent = "İşlem yapılıyor…"; $("procSub").textContent = "Lütfen bekleyin";
+      overlay("procUi", true); st.busy = true; await wait(1100); overlay("procUi", false); st.busy = false;
+      log("Korumasız mod: risk kontrolü yapılmadı", "işlem gönderildi");
+      showOk(ev); return;
+    }
+    $("procText").textContent = "Güvenli An kontrol ediyor…"; $("procSub").textContent = "Sinyaller birlikte değerlendiriliyor";
+    overlay("procUi", true);
+    const d = await evaluate(ev);
+    overlay("procUi", false);
+    if (d === "ok") showOk(ev);
+    else if (d === "hold") {
+      // Kural eşiği aşıldı: soru yine sorulur ama cevap kararı değiştirmez (yönlendirilen müşteri "hayır" diyebilir)
+      st.pending = ev; overlay("askUi", true); log("Ek kontrol sorusu soruldu", "yatırım fonu / güvenli hesap");
+    } else {
+      st.pending = ev;
+      $("verifyDetails").innerHTML = summary(ev);
+      $("verifyWhy").innerHTML = reasonsOf(ev).map(x => `<li>${x}</li>`).join("") || "<li>Model bu işlemi alışılmadık buldu</li>";
+      $("qSafe").value = ""; $("qPressure").value = ""; $("qError").textContent = "";
+      show("verify"); log("Ek doğrulama: iki kısa soru gösterildi");
+    }
+  };
+  document.querySelectorAll("[data-ans]").forEach(b => b.onclick = () => {
+    const ev = st.pending; if (!ev) return;
+    st.pending = null; overlay("askUi", false);
+    if (b.dataset.ans === "yes") { ev.coerced = true; log("Müşteri yanıtı: evet", "yönlendirme bildirildi → HOLD"); }
+    else log("Müşteri yanıtı: hayır", `tek cevaba güvenilmez · kural skoru ${st.last.score} ≥ 70 → HOLD`);
+    showHold(ev);
+  });
+  $("verifyCancel").onclick = () => { log("Müşteri vazgeçti", "işlem iptal"); st.pending = null; show("home"); };
+  $("verifyGo").onclick = () => {
+    const ev = st.pending; if (!ev) return;
+    const a = [$("qSafe").value, $("qPressure").value];
+    if (a.includes("")) { $("qError").textContent = "İki soruyu da yanıtla."; return; }
+    st.pending = null;
+    const tr = { yes: "evet", no: "hayır", unsure: "emin değil" };
+    log(`Müşteri yanıtları: güvenli hesap=${tr[a[0]]}, baskı=${tr[a[1]]}`);
+    if (a.includes("yes")) { ev.coerced = true; log("Müşteri yönlendirme bildirdi", "HOLD"); show("home"); showHold(ev); }
+    else if (a.includes("unsure")) { ev.unsure = true; log("Belirsiz yanıt", "uzman incelemesi → HOLD"); show("home"); showHold(ev); }
+    else if (ev.activeCall) { log("Doğrulamada aktif çağrı", "HOLD"); show("home"); showHold(ev); }
+    else { log("Müşteri doğruladı", "onay"); showOk(ev, "müşteri doğruladı"); }
+  };
+
+  // ---- "Görüşmeyi kapattım, Bankamı ara": resmî kanala geçiş ----
+  $("callBankBtn").onclick = async () => {
+    endCall("Müşteri şüpheli görüşmeyi kapattı");
+    overlay("holdUi", false);
+    $("bankUi").classList.remove("connected"); $("incident").classList.remove("on");
+    $("bankStatus").innerHTML = 'Aranıyor<span class="dots"></span>';
+    overlay("bankUi", true);
+    st.bankCall = true; st.bankStart = 0; $("island").classList.add("call");
+    log("Müşteri bankayı uygulama içinden aradı", "doğrulanmış kanal");
+    await wait(2400);
+    if (!st.bankCall) return;
+    st.bankStart = Date.now();
+    $("bankUi").classList.add("connected"); $("bankStatus").textContent = "Bağlandı · kimliğin uygulamada doğrulandı";
+    const no = st.brand.prefix + "-2026-" + String(++st.incident).padStart(5, "0"), ev = st.held;
+    $("incident").innerHTML = `Olay no <b>${no}</b><br>✓ Paran hesabında, hiçbir yere gitmedi<br>✓ İşlem iptal edildi<br>✓ Alıcı hesap incelemeye işaretlendi${ev ? `: ${ev.to}` : ""}`;
+    $("incident").classList.add("on");
+    const t = st.tx.find(x => x.ev === ev && x.status === "hold"); if (t) { t.status = "cancel"; t.label = "güvenlik hattı · " + no; renderTx(); }
+    log("Güvenlik hattı bağlandı", "olay " + no);
+    timeline(`Müşteri güvenlik hattını uygulama içinden aradı · olay ${no}`, "auto");
+    if (ev) flagAccount(ev.to, "müşteri bildirimi · güvenlik hattı", "bildirim"); else renderSre();
+    log("Alıcı hesap işaretlendi: " + (ev ? ev.to : "-"), "katır hesap incelemesi");
+  };
+  $("bankEnd").onclick = () => {
+    st.bankCall = false; overlay("bankUi", false);
+    if (!st.call) { $("island").classList.remove("call"); $("callTimer").textContent = ""; }
+    show("home"); log("Güvenlik hattı görüşmesi bitti");
+  };
+
+  // ---- SRE paneli: bütün işlemler (log 4a, metrik 4b, alarm 4c, otomatik bekletme 3a, katır hesap) ----
+  const WINDOW = 30 * 60 * 1000, RATIO_ALARM = 0.02, MIN_FOR_ALARM = 20;
+  const normalPool = D.sample.filter(r => !r.isFraud);
+  const ATTACK_TO = ["Kalkınma Fonu Tahsilat", "Yatırım Katılım Hesabı"];
+  let trafficTimer = null, tIdx = 0;
+  const newHigh = ev => !!ev.newBeneficiary && ev.amount >= 20000;
+  const hhmm = ts => new Date(ts).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  const pct1 = v => "%" + (v * 100).toFixed(1).replace(".", ",");
+  // v1 katır sinyali: 30 dakikada aynı alıcıya en az 4 ayrı yeni gönderici, yüksek tutar
+  function sendersInWindow(to, ts) { return new Set((st.sre.fan[to] || []).filter(x => ts - x.ts <= WINDOW).map(x => x.from)); }
+  function fanInCount(ev) { const s = sendersInWindow(ev.to, ev.ts); if (newHigh(ev)) s.add(ev.from); return s.size; }
+  // Animasyonsuz puanlama (aynı RULES, model ve karar tablosu): toplu trafik için
+  function quickScore(ev) {
+    const f = featuresOf(ev); let score = 0;
+    RULES.forEach(([, pt, fn]) => { if (fn(ev)) score += pt; });
+    const p = model(f).p, g = gbProb(f), lrFlag = p >= M.threshold, gbFlag = g >= G.threshold;
+    return { score, p, g, agree: lrFlag === gbFlag, decision: score >= 70 ? "hold" : lrFlag ? "verify" : "ok" };
+  }
+  const paysimEvent = (r, ts) => ({ source: "PaySim", ts, from: r.from, to: r.to, amount: r.amount, balance: r.balance, destBalance: r.destBalance, destPrior: r.destPrior,
+    destSenders: r.destSendersSameHour, newBeneficiary: r.destPrior === 0, activeCall: null, remoteAccess: null, hour: r.step % 24, isFraud: r.isFraud });
+  function timeline(text, cls) { st.sre.events.push({ ts: Date.now(), text, cls, fresh: true }); }
+  function sreRecord(ev, r, opts = {}) {
+    const S = st.sre, k = S.k, ts = ev.ts || Date.now();
+    k.total++; k[r.decision]++; if (r.decision === "hold") k.held += ev.amount; if (!r.agree) k.shadow++;
+    if (ev.source !== "PaySim" && newHigh(ev)) (S.fan[ev.to] ||= []).push({ ts, from: ev.from });
+    S.rows.push({ ts, from: ev.from, to: ev.to, amount: ev.amount, score: r.score, decision: r.decision, source: ev.source, fresh: !opts.silent });
+    if (!opts.silent) {
+      if (r.decision === "hold" && !S.firstHold) { S.firstHold = ts; timeline(`İlk HOLD: ${ev.to} (${ev.source})`, "hold"); }
+      const senders = ev.source !== "PaySim" ? sendersInWindow(ev.to, ts).size : 0;
+      if (senders >= 4 && S.mules.get(ev.to)?.kind !== "katır") flagAccount(ev.to, `${senders} farklı yeni gönderici / 30 dk`, "katır");
+      const risky = (k.hold + k.verify) / k.total;
+      if (!S.alarm && k.total >= MIN_FOR_ALARM && risky >= RATIO_ALARM) {
+        S.alarm = ts; timeline(`ALARM: riskli oran ${pct1(risky)} ≥ %2 → nöbetçi ekip bilgilendirildi`, "alarm");
+        log("SRE ALARM (4c)", `riskli oran ${pct1(risky)} ≥ %2`);
+      }
+    }
+    if (!opts.batch) renderSre();
+  }
+  function flagAccount(acct, why, kind) {
+    const S = st.sre, prev = S.mules.get(acct);
+    if (prev && prev.kind === "katır") return;
+    S.mules.set(acct, { why, kind, fresh: true });
+    if (kind === "katır") {
+      timeline(`Katır hesap tespit edildi: ${acct} (${why})`, "mule");
+      timeline(`Otomatik aksiyon (3a): ${acct} hesabına girişler donduruldu · karşı bankaya bildirim (demo)`, "auto");
+      log("Katır hesap tespit edildi: " + acct, "donduruldu (demo)");
+    } else {
+      timeline(`Hesap incelemeye alındı: ${acct} (${why})`, "mule");
+    }
+    renderSre();
+  }
+  function bump(id, text) { const el = $(id); if (el.textContent !== text) { el.textContent = text; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); } }
+  function renderSre() {
+    const S = st.sre, k = S.k, risky = k.total ? (k.hold + k.verify) / k.total : 0, alarmNow = k.total >= MIN_FOR_ALARM && risky >= RATIO_ALARM;
+    bump("kTotal", String(k.total)); bump("kHold", String(k.hold)); bump("kVerify", String(k.verify));
+    bump("kRatio", pct1(risky)); bump("kHeld", tl(k.held)); bump("kShadow", String(k.shadow));
+    $("kRatioBox").classList.toggle("alarm", alarmNow);
+    $("sreAlarm").classList.toggle("on", !!S.alarm);
+    if (S.alarm) $("sreAlarm").innerHTML = `ALARM · riskli işlem oranı ${pct1(risky)} &gt; %2<small>${hhmm(S.alarm)} itibarıyla nöbetçi ekip bilgilendirildi · eşiği aşan işlemler otomatik bekletiliyor</small>`;
+    $("sreMules").innerHTML = S.mules.size ? [...S.mules].map(([acct, m]) => `<li class="${m.kind === "katır" ? "" : "bildirim"} ${m.fresh ? "new" : ""}"><span>${acct}<small>${m.why}</small></span><span class="tag">${m.kind === "katır" ? "DONDURULDU" : "İNCELEMEDE"}</span></li>`).join("")
+      : `<li class="empty">Henüz tespit yok</li>`;
+    $("sreTimeline").innerHTML = S.events.length ? S.events.map(e => `<li class="${e.cls} ${e.fresh ? "new" : ""}"><time>${hhmm(e.ts)}</time>${e.text}</li>`).join("")
+      : `<li class="empty">Olay yok · arka plan trafiği normal</li>`;
+    $("sreLog").innerHTML = S.rows.slice(-12).reverse().map(r => `<tr class="${r.fresh ? "in" : ""} ${r.decision}"><td>${hhmm(r.ts)}</td><td>${r.from} → ${r.to}<small>${r.source}</small></td><td>${tl(r.amount)}</td><td>${r.score}</td><td><span class="dtag ${r.decision}">${{ ok: "Onay", verify: "Ek doğr.", hold: "HOLD" }[r.decision]}</span></td></tr>`).join("");
+    S.rows.forEach(r => r.fresh = false); S.events.forEach(e => e.fresh = false); S.mules.forEach(m => m.fresh = false);
+  }
+  function resetSre() {
+    if (trafficTimer) { clearInterval(trafficTimer); trafficTimer = null; $("sreTraffic").setAttribute("aria-pressed", "false"); $("sreTraffic").textContent = "▶ Canlı trafik"; }
+    st.sre = { k: { total: 0, hold: 0, verify: 0, ok: 0, held: 0, shadow: 0 }, rows: [], fan: {}, mules: new Map(), events: [], alarm: 0, firstHold: 0, attacking: false };
+    // Arka plan: PaySim'deki 140 normal işlem, son 30 dakikaya yayılmış
+    const now = Date.now();
+    normalPool.forEach((r, i) => { const ev = paysimEvent(r, now - (normalPool.length - i) * (WINDOW / normalPool.length)); sreRecord(ev, quickScore(ev), { silent: true, batch: true }); });
+    st.sre.rows.forEach(r => r.fresh = false);
+    renderSre();
+  }
+  $("sreAttack").onclick = async () => {
+    const S = st.sre; if (S.attacking) return;
+    S.attacking = true; $("sreAttack").disabled = true;
+    log("SRE: saldırı dalgası simüle ediliyor", "aynı senaryo 8 müşteriye");
+    timeline("Saldırı dalgası: aynı “Maliye” senaryosu 8 müşteriye (simülasyon)", "info"); renderSre();
+    for (let i = 0; i < 8; i++) {
+      if (st.sre !== S) return;   // sıfırlandıysa dur
+      const bal = 60000 + Math.round(Math.random() * 90000);
+      const ev = { source: "simülasyon", ts: Date.now(), from: "Müşteri " + (2041 + i * 7), to: ATTACK_TO[i % 2], amount: Math.round(bal * (0.7 + Math.random() * 0.25)), balance: bal,
+        destBalance: 0, destPrior: 0, newBeneficiary: true, activeCall: true, remoteAccess: i % 3 === 0, hour: new Date().getHours(), isFraud: null };
+      ev.destSenders = fanInCount(ev);
+      sreRecord(ev, quickScore(ev));
+      await wait(420);
+    }
+    S.attacking = false; $("sreAttack").disabled = false;
+  };
+  $("sreTraffic").onclick = () => {
+    if (trafficTimer) { clearInterval(trafficTimer); trafficTimer = null; $("sreTraffic").setAttribute("aria-pressed", "false"); $("sreTraffic").textContent = "▶ Canlı trafik"; return; }
+    $("sreTraffic").setAttribute("aria-pressed", "true"); $("sreTraffic").textContent = "❚❚ Canlı trafik";
+    trafficTimer = setInterval(() => { const ev = paysimEvent(normalPool[tIdx++ % normalPool.length], Date.now()); sreRecord(ev, quickScore(ev)); }, 1800);
+  };
+  $("sreReset").onclick = () => { resetSre(); log("SRE paneli sıfırlandı", "arka plan: 140 PaySim normal işlemi"); };
+
+  // ---- Veri setinden oynat ----
+  const pool = { 0: D.sample.filter(r => !r.isFraud), 1: D.sample.filter(r => r.isFraud) };
+  const idx = { 0: 0, 1: 0 };
+  async function replay(isFraud) {
+    if (st.busy) return;
+    const r = pool[isFraud][idx[isFraud]++ % pool[isFraud].length];
+    log(`Veri setinden ${isFraud ? "fraud" : "normal"} işlem: ${r.from} → ${r.to}`);
+    return evaluate({ source: "PaySim", from: r.from, to: r.to, amount: r.amount, balance: r.balance, destBalance: r.destBalance, destPrior: r.destPrior, destSenders: r.destSendersSameHour,
+      newBeneficiary: r.destPrior === 0, activeCall: null, remoteAccess: null, hour: r.step % 24, isFraud: r.isFraud });
+  }
+  $("rpNormal").onclick = () => replay(0);
+  $("rpFraud").onclick = () => replay(1);
+  let auto = false;
+  $("rpAuto").onclick = async () => {
+    auto = !auto; $("rpAuto").textContent = auto ? "❚❚ Durdur" : "▶ Otomatik oynat";
+    while (auto) { await replay(Math.random() < 0.4 ? 1 : 0); await wait(900); }
+  };
+
+  setMode(new URLSearchParams(location.search).get("mod") === "korumasiz" ? "unprotected" : "protected");
+  log("Demo hazır · bakiye " + tl(me.balance) + " · normal transfer " + tl(me.normal));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+=== METRIKLER (4b) ===
+Toplam islem            : 310
+Riskli (bekletilen)     : 8  -> oran 2.6% (ALARM, esik 2%)
+Yakalanan fraud         : 8/8
+Yanlis alarm            : 0
+Korunan tutar           : 533,184 TL / 533,184 TL
+Ilk fraud -> ilk alarm  : 0 sn (MTTD)
+
+=== ALARMLAR (4c) -> HOLD (3a otomasyon) ===
+11:02 C018 -> M901    83,603 TL skor=100 [yeni alici, yuksek tutar, islem sirasinda aktif cagri, uzaktan erisim uygulamasi]
+11:04 C020 -> M902    71,406 TL skor= 80 [yeni alici, yuksek tutar, islem sirasinda aktif cagri]
+11:10 C010 -> M901    42,208 TL skor=100 [yeni alici, yuksek tutar, islem sirasinda aktif cagri, uzaktan erisim uygulamasi]
+11:13 C038 -> M902    43,484 TL skor= 80 [yeni alici, yuksek tutar, islem sirasinda aktif cagri]
+11:16 C013 -> M901    80,724 TL skor=100 [yeni alici, yuksek tutar, islem sirasinda aktif cagri, uzaktan erisim uygulamasi]
+11:22 C065 -> M902    79,497 TL skor= 80 [yeni alici, yuksek tutar, islem sirasinda aktif cagri]
+11:24 C099 -> M901    74,665 TL skor=130 [yeni alici, yuksek tutar, islem sirasinda aktif cagri, uzaktan erisim uygulamasi, katir hesap sinyali (4 gonderici)]
+11:28 C070 -> M902    57,597 TL skor=110 [yeni alici, yuksek tutar, islem sirasinda aktif cagri, katir hesap sinyali (4 gonderici)]
+
+Katir hesap adaylari (dondurulacak): M901, M902

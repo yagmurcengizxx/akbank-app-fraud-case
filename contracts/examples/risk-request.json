@@ -1,0 +1,19 @@
+{
+  "eventId": "evt-0001",
+  "occurredAt": "2026-10-17T08:05:00Z",
+  "customerId": "C001",
+  "beneficiaryId": "M901",
+  "amountTry": 50000,
+  "isNewBeneficiary": true,
+  "call": {
+    "isActive": true,
+    "source": "SIMULATED",
+    "reputation": "UNKNOWN"
+  },
+  "remoteAccessDetected": false,
+  "muleFanInCount": 1,
+  "textSignals": [
+    "SAFE_ACCOUNT",
+    "URGENCY"
+  ]
+}

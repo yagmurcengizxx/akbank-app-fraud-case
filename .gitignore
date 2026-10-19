@@ -1,0 +1,16 @@
+demo/transfers.log
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.venv/
+dist/
+build/
+.DS_Store
+*.sqlite3
+*.db
+
+demo/data/*.csv
+demo/data/*.zip

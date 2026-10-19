@@ -1,0 +1,22 @@
+name: Demo checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python syntax
+        run: python -m compileall -q demo tests
+      - name: Unit tests and contract fixture
+        run: python -m unittest discover -s tests -v
+      - name: Existing deterministic demo
+        run: python demo/fraud_detection_demo.py
+      - name: JSON parses
+        run: python -c "import json,pathlib; [json.loads(p.read_text()) for p in pathlib.Path('contracts').rglob('*.json')]"
+

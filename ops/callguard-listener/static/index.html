@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>CallGuard — GSM Audio Monitor</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <div><span class="brand-mark">CG</span><div><h1>CallGuard <small>— GSM Audio Monitor</small></h1><p>Consent-based acoustic bridge · no raw audio storage</p></div></div>
+    <span id="serviceBadge" class="badge neutral">SERVICE CHECK</span>
+  </header>
+  <main>
+    <section class="notice"><strong>Physical audio path:</strong> Phone C speaker → computer microphone → encrypted WebSocket. This tool does not access GSM audio directly and does not transcribe speech.</section>
+    <div class="mode-tabs" role="tablist">
+      <button class="mode active" data-mode="LIVE_MICROPHONE">LIVE MICROPHONE</button>
+      <button class="mode" data-mode="SYNTHETIC_TEST">SYNTHETIC TEST</button>
+    </div>
+    <div id="syntheticBanner" class="synthetic-banner hidden">SYNTHETIC SIGNAL — not a person, call, or GSM capture</div>
+    <div class="grid">
+      <section class="card session-card">
+        <div class="card-title"><span>01</span><h2>Test Session</h2></div>
+        <label>Operator admin key<input id="adminKey" type="password" autocomplete="off" placeholder="CALLGUARD_ADMIN_KEY"></label>
+        <label>Test phone label<input id="phone" type="tel" value="+905550000000" autocomplete="off"></label>
+        <label class="check"><input id="risk" type="checkbox"> Mark this number as risky (manual label)</label>
+        <label class="check"><input id="consent" type="checkbox"> All participants are informed and have consented</label>
+        <div class="actions"><button id="startSession" class="primary">Start test session</button><button id="stopSession" disabled>Stop test</button></div>
+        <dl><div><dt>Session ID</dt><dd id="sessionId">—</dd></div><div><dt>Status</dt><dd id="sessionStatus">IDLE</dd></div><div><dt>Test duration</dt><dd id="duration">00:00</dd></div></dl>
+      </section>
+      <section class="card connection-card">
+        <div class="card-title"><span>02</span><h2>Audio Connection</h2></div>
+        <label>Microphone<select id="microphones"><option>Request permission to list devices</option></select></label>
+        <dl><div><dt>Permission</dt><dd id="permission">NOT REQUESTED</dd></div><div><dt>WebSocket</dt><dd id="socketStatus">DISCONNECTED</dd></div><div><dt>Connected</dt><dd id="connectedFor">00:00</dd></div><div><dt>Format</dt><dd>PCM16 · mono · 16 kHz</dd></div></dl>
+        <div class="actions"><button id="connect" class="primary" disabled>Connect</button><button id="disconnect" disabled>Disconnect</button></div>
+        <div id="syntheticControls" class="synthetic-controls hidden">
+          <button data-signal="silence">Send silence</button><button data-signal="tone">Send 440 Hz tone</button><button data-signal="sweep">Vary amplitude</button><button id="interrupt">Interrupt stream</button><button id="reconnect">Reconnect</button>
+        </div>
+        <p id="error" class="error" aria-live="polite"></p>
+      </section>
+      <section class="card monitor-card">
+        <div class="card-title"><span>03</span><h2>Live Audio Monitor</h2></div>
+        <div class="meter"><div id="meterFill"></div></div><div class="meter-label"><span>−∞</span><strong id="level">0%</strong><span>0 dBFS</span></div>
+        <div class="metrics">
+          <article><span>Audio packets</span><strong id="packets">0</strong></article><article><span>Received bytes</span><strong id="bytes">0 B</strong></article><article><span>RMS</span><strong id="rms">0.0000</strong></article><article><span>Peak level</span><strong id="peak">0.0000</strong></article><article><span>Audio activity</span><strong id="activity">0</strong></article><article><span>Packet rate</span><strong id="rate">0.0/s</strong></article><article class="wide"><span>Last packet</span><strong id="lastPacket">—</strong></article>
+        </div>
+      </section>
+      <section class="card log-card">
+        <div class="card-title"><span>04</span><h2>Event Logs</h2><div class="spacer"></div><button id="clearLogs">Clear</button><button id="exportLogs">Export JSON</button></div>
+        <div id="logs" class="logs"><p class="empty">Waiting for a test session…</p></div>
+      </section>
+    </div>
+  </main>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
+

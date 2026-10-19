@@ -1,0 +1,15 @@
+callguard.example.com {
+    encode zstd gzip
+    basic_auth {
+        operator {$CALLGUARD_BASIC_AUTH_HASH}
+    }
+    reverse_proxy 127.0.0.1:8091
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "no-referrer"
+        Permissions-Policy "microphone=(self)"
+        Content-Security-Policy "default-src 'self'; connect-src 'self' wss:; script-src 'self'; style-src 'self'; object-src 'none'; frame-ancestors 'none'"
+    }
+}
+

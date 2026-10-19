@@ -1,0 +1,29 @@
+TRANSFER islemi: 532,909  (egitim 373,036, test 159,873; test fraud: 2,278 = 1.42%)
+
+A) Varsayilan esik (kural: skor>=70, modeller: olasilik>=0.5)
+Model                      Yakalama  Kesinlik    Yanlis     AUC
+1. Kural tabanli             100.0%      4.7%    29.17%   0.987
+2. Lojistik regresyon        100.0%    100.0%     0.00%   1.000
+3. Gradient boosting          99.9%    100.0%     0.00%   1.000
+
+B) Esit yanlis alarm butcesi (normal islemlerin en fazla 0.5%'i alarm)
+Model                      Yakalama  Kesinlik    Yanlis     AUC
+1. Kural tabanli              95.3%     73.4%     0.50%   0.987
+2. Lojistik regresyon        100.0%     74.3%     0.50%   1.000
+3. Gradient boosting         100.0%     80.5%     0.35%   1.000
+Hibrit (ML + kritik kural)   100.0%     80.5%     0.35%   1.000
+
+C) Saglamlik kontrolu: 'tum bakiye' ve iliskili sinyaller olmadan
+Model                      Yakalama  Kesinlik    Yanlis     AUC
+2. Lojistik regresyon         28.1%     44.8%     0.50%   0.963
+3. Gradient boosting          27.0%     44.8%     0.48%   0.958
+
+Seviye 2 agirliklari (standartlastirilmis; + fraud'a iter):
+  hesap_bosaldi        -2.80
+  log_tutar            +2.63
+  tum_bakiye           +2.03
+  tutar_orani          -1.72
+  alici_onceki_islem   -1.07
+  tutar_ust_kisim      -0.82
+  alici_bos_hesap      +0.79
+  gece                 -0.00

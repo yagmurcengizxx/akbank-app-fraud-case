@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Örnek Banka · APP Fraud Demo</title>
+<style>
+  :root { --red:#d81e3a; --dark:#2b0a10; --tint:#fdecee; --ink:#2e2e2e; --muted:#6b6b6b; --line:#ead3d7; --ok:#1d8a4e; --warn:#c77700; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Segoe UI, Calibri, Arial, sans-serif; color:var(--ink); background:#f6f2f3; }
+  header { background:var(--dark); color:#fff; padding:14px 24px; display:flex; align-items:center; gap:12px; }
+  header b { font-size:20px; } header span { color:#f4b6bf; font-size:14px; }
+  main { display:grid; grid-template-columns:420px 1fr; gap:20px; padding:20px 24px; max-width:1200px; margin:0 auto; }
+  @media (max-width:900px){ main{grid-template-columns:1fr;} }
+  .card { background:#fff; border-radius:16px; padding:18px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  h2 { margin:0 0 12px; font-size:17px; color:var(--red); }
+  .balance { background:var(--red); color:#fff; border-radius:14px; padding:16px; margin-bottom:14px; }
+  .balance small { opacity:.85; } .balance div { font-size:28px; font-weight:700; }
+  label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  input, select { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:15px; }
+  .sim { background:var(--tint); border-radius:12px; padding:10px 12px; margin-top:14px; font-size:14px; }
+  .sim p { margin:0 0 6px; font-weight:600; color:var(--red); }
+  .sim label { display:flex; gap:8px; align-items:center; margin:4px 0; color:var(--ink); font-size:14px; }
+  .sim input { width:auto; }
+  button { cursor:pointer; border:0; border-radius:10px; padding:11px 16px; font-size:15px; font-weight:600; }
+  .primary { background:var(--red); color:#fff; width:100%; margin-top:14px; }
+  .ghost { background:#fff; color:var(--red); border:1.5px solid var(--red); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+  @media (max-width:600px){ .stats{grid-template-columns:repeat(2,1fr);} }
+  .stat { background:var(--tint); border-radius:12px; padding:12px; text-align:center; }
+  .stat b { display:block; font-size:24px; color:var(--red); } .stat span { font-size:12px; color:var(--muted); }
+  .stat.alarm b { color:#fff; } .stat.alarm { background:var(--red); } .stat.alarm span { color:#fff; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; color:var(--muted); font-weight:600; padding:6px; border-bottom:1px solid var(--line); }
+  td { padding:7px 6px; border-bottom:1px solid #f1e6e8; vertical-align:top; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:12px; font-weight:600; }
+  .tag.ok { background:#e3f4ea; color:var(--ok); } .tag.hold { background:#fde0e4; color:var(--red); }
+  .reason { color:var(--muted); font-size:12px; }
+  .mules { margin-top:12px; font-size:14px; } .mules b { color:var(--red); }
+  #overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:16px; }
+  #overlay.show { display:flex; }
+  .modal { background:#fff; border-radius:18px; max-width:420px; padding:22px; }
+  .modal h3 { margin:0 0 8px; color:var(--red); } .modal ul { margin:8px 0 14px; padding-left:20px; font-size:14px; }
+  .modal .btns { display:flex; gap:10px; } .modal .btns button { flex:1; }
+  .toast { margin-top:12px; padding:10px 12px; border-radius:10px; font-size:14px; display:none; }
+  .toast.ok { display:block; background:#e3f4ea; color:var(--ok); } .toast.hold { display:block; background:#fde0e4; color:var(--red); }
+</style>
+</head>
+<body>
+<header><b>Örnek Banka</b><span>APP Fraud demo · kurgusal veri, gerçek banka değildir</span></header>
+<main>
+  <section class="card" aria-label="Müşteri uygulaması">
+    <h2>Müşteri: Mobil bankacılık</h2>
+    <div class="balance"><small>Vadesiz hesap · Ahmet Kaya</small><div id="balance">₺120.000,00</div></div>
+    <label for="payee">Alıcı</label>
+    <select id="payee">
+      <option value="Ayşe Yılmaz">Ayşe Yılmaz (kayıtlı)</option>
+      <option value="Mehmet Demir">Mehmet Demir (kayıtlı)</option>
+      <option value="M901 · Güvenli Hesap">M901 · "Güvenli Hesap" (yeni alıcı)</option>
+    </select>
+    <label for="amount">Tutar (₺)</label>
+    <input id="amount" type="number" min="1" value="2500">
+    <div class="sim">
+      <p>Saldırı koşulları (simülasyon)</p>
+      <label><input type="checkbox" id="call"> İşlem sırasında telefon görüşmesi sürüyor</label>
+      <label><input type="checkbox" id="remote"> Uzaktan erişim uygulaması açık</label>
+    </div>
+    <button class="primary" id="send">Gönder</button>
+    <div id="toast" class="toast"></div>
+  </section>
+
+  <section class="card" aria-label="SRE paneli">
+    <h2>SRE / Fraud izleme paneli</h2>
+    <div class="row">
+      <button class="ghost" id="normal">Normal havale üret</button>
+      <button class="primary" id="attack" style="width:auto;margin:0">Saldırı simüle et (8 kurban)</button>
+      <button class="ghost" id="reset">Sıfırla</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><span>toplam işlem</span></div>
+      <div class="stat"><b id="sHold">0</b><span>bekletilen (HOLD)</span></div>
+      <div class="stat" id="ratioBox"><b id="sRatio">%0</b><span>riskli oran (eşik %2)</span></div>
+      <div class="stat"><b id="sSaved">₺0</b><span>korunan tutar</span></div>
+    </div>
+    <table>
+      <thead><tr><th>Saat</th><th>Gönderen → Alıcı</th><th>Tutar</th><th>Skor</th><th>Karar</th></tr></thead>
+      <tbody id="log"></tbody>
+    </table>
+    <div class="mules">Katır hesap adayları: <b id="mules">-</b></div>
+  </section>
+</main>
+
+<div id="overlay"><div class="modal" role="dialog" aria-modal="true">
+  <h3>Bu işlem dolandırıcılık olabilir</h3>
+  <div id="mReason"></div>
+  <p style="font-size:14px;margin:0 0 14px">Banka, sizden para aktarmanızı asla istemez. Telefonda sizi arayan kişiyle konuşmaya devam etmeyin.</p>
+  <div class="btns"><button class="primary" style="margin:0" id="cancel">Vazgeç</button><button class="ghost" id="proceed">Yine de gönder</button></div>
+</div></div>
+
+<script>
+// --- Kurallar (demo/fraud_detection_demo.py ile aynı mantık) ---
+const HIGH = 20000, HOLD_SCORE = 70, MULE_N = 4, MULE_WIN = 30 * 60 * 1000, RATIO_ALERT = 0.02;
+const known = new Set(["Ayşe Yılmaz", "Mehmet Demir"]);
+const state = { balance: 120000, tx: [], fanIn: {}, mules: new Set(), pending: null };
+const $ = id => document.getElementById(id);
+const tl = n => "₺" + Math.round(n).toLocaleString("tr-TR");
+
+function score(t) {
+  let s = 0; const r = [];
+  if (!t.known) { s += 30; r.push("yeni alıcı"); }
+  if (t.amount >= HIGH) { s += 25; r.push("yüksek tutar"); }
+  if (t.call) { s += 25; r.push("aktif çağrı"); }
+  if (t.remote) { s += 20; r.push("uzaktan erişim"); }
+  if (!t.known && t.amount >= HIGH) {
+    const f = (state.fanIn[t.to] ||= []);
+    f.push({ ts: t.ts, from: t.from });
+    const senders = new Set(f.filter(x => t.ts - x.ts <= MULE_WIN).map(x => x.from));
+    if (senders.size >= MULE_N) { s += 30; r.push(`katır sinyali (${senders.size} gönderici)`); state.mules.add(t.to); }
+  }
+  return { s, r };
+}
+
+function record(t, forceHold) {
+  const { s, r } = score(t);
+  const hold = forceHold ?? s >= HOLD_SCORE;
+  state.tx.push({ ...t, s, r, hold });
+  render();
+  return { s, r, hold };
+}
+
+function render() {
+  const total = state.tx.length, held = state.tx.filter(x => x.hold);
+  const ratio = total ? held.length / total : 0;
+  $("sTotal").textContent = total; $("sHold").textContent = held.length;
+  $("sRatio").textContent = "%" + (ratio * 100).toFixed(1).replace(".", ",");
+  $("ratioBox").className = "stat" + (total && ratio >= RATIO_ALERT ? " alarm" : "");
+  $("sSaved").textContent = tl(held.reduce((a, x) => a + x.amount, 0));
+  $("mules").textContent = state.mules.size ? [...state.mules].join(", ") + " → dondurulacak" : "-";
+  $("log").innerHTML = state.tx.slice().reverse().slice(0, 14).map(x => `<tr>
+    <td>${new Date(x.ts).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</td>
+    <td>${x.from} → ${x.to}<div class="reason">${x.r.join(", ") || "risk sinyali yok"}</div></td>
+    <td>${tl(x.amount)}</td><td>${x.s}</td>
+    <td><span class="tag ${x.hold ? "hold" : "ok"}">${x.hold ? "HOLD" : "Onay"}</span></td></tr>`).join("");
+}
+
+function toast(kind, msg) { const t = $("toast"); t.className = "toast " + kind; t.textContent = msg; }
+
+$("send").onclick = () => {
+  const amount = parseFloat($("amount").value);
+  if (!(amount > 0)) return toast("hold", "Geçerli bir tutar girin.");
+  if (amount > state.balance) return toast("hold", "Yetersiz bakiye.");
+  const to = $("payee").value;
+  const t = { ts: Date.now(), from: "Ahmet Kaya", to, amount, known: known.has(to), call: $("call").checked, remote: $("remote").checked };
+  // Önce skoru hesapla (kayıt eklemeden)
+  const probe = JSON.parse(JSON.stringify(state.fanIn));
+  const { s, r } = score(t);
+  state.fanIn = probe;
+  if (s >= HOLD_SCORE) {
+    state.pending = t;
+    $("mReason").innerHTML = `<p style="margin:0 0 6px;font-size:14px">Risk skoru <b>${s}</b>. Nedenler:</p><ul>${r.map(x => `<li>${x}</li>`).join("")}</ul>`;
+    $("overlay").classList.add("show");
+  } else {
+    record(t, false); state.balance -= amount; $("balance").textContent = tl(state.balance).replace("₺", "₺") + ",00";
+    toast("ok", `${tl(amount)} ${to} hesabına gönderildi.`);
+  }
+};
+$("cancel").onclick = () => { $("overlay").classList.remove("show"); state.pending = null; toast("ok", "İşlem iptal edildi. Dolandırıcılık engellendi."); };
+$("proceed").onclick = () => {
+  $("overlay").classList.remove("show");
+  record(state.pending, true);   // Yine de gönder → HOLD: ek doğrulama / inceleme
+  toast("hold", "İşlem güvenlik incelemesi için bekletildi (HOLD). Para çıkmadı, ekibimiz sizi arayacak.");
+  state.pending = null;
+};
+
+$("normal").onclick = () => {
+  const names = ["Ayşe Yılmaz", "Mehmet Demir"];
+  record({ ts: Date.now(), from: "Müşteri " + (100 + Math.floor(Math.random() * 900)), to: names[Math.floor(Math.random() * 2)],
+    amount: 200 + Math.random() * 5000, known: true, call: false, remote: false });
+};
+$("attack").onclick = () => {
+  for (let i = 0; i < 8; i++) {
+    record({ ts: Date.now() + i, from: "Kurban " + (i + 1), to: i % 2 ? "M902" : "M901", amount: 35000 + Math.random() * 55000,
+      known: false, call: true, remote: i % 2 === 0 });
+  }
+};
+$("reset").onclick = () => { state.tx = []; state.fanIn = {}; state.mules.clear(); state.balance = 120000; $("balance").textContent = "₺120.000,00"; $("toast").className = "toast"; render(); };
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "eventId": "evt-0001",
+  "ruleVersion": "v1",
+  "score": 80,
+  "decision": "HOLD",
+  "reasonCodes": [
+    "NEW_BENEFICIARY",
+    "HIGH_AMOUNT",
+    "ACTIVE_CALL"
+  ],
+  "simulation": true
+}

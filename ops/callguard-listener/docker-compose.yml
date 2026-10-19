@@ -1,0 +1,31 @@
+services:
+  callguard-listener:
+    build: .
+    image: callguard-listener:local
+    restart: unless-stopped
+    environment:
+      CALLGUARD_ADMIN_KEY: ${CALLGUARD_ADMIN_KEY:?set CALLGUARD_ADMIN_KEY}
+      CALLGUARD_ALLOWED_ORIGINS: ${CALLGUARD_ALLOWED_ORIGINS:?set CALLGUARD_ALLOWED_ORIGINS}
+      CALLGUARD_SESSION_TTL_SECONDS: ${CALLGUARD_SESSION_TTL_SECONDS:-900}
+      CALLGUARD_MAX_FRAME_BYTES: ${CALLGUARD_MAX_FRAME_BYTES:-8192}
+    ports:
+      - "127.0.0.1:${CALLGUARD_PORT:-8091}:8091"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8091/health', timeout=2)"]
+      interval: 20s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 384M
+        reservations:
+          memory: 96M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+

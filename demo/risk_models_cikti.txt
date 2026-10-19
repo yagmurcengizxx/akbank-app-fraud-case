@@ -1,0 +1,34 @@
+Veri: 30000 islem, fraud orani 1.9% (test: 12000 islem, 230 fraud)
+
+A) Varsayilan karar esigiyle (kural: skor>=70, modeller: olasilik>=0.5)
+Model                      Yakalama  Kesinlik    Yanlis     AUC
+1. Kural tabanli              54.3%     99.2%     0.01%   0.974
+2. Lojistik regresyon         92.2%     25.4%     5.29%   0.983
+3. Gradient boosting          78.7%     95.8%     0.07%   0.978
+
+B) Esit yanlis alarm butcesiyle (normal islemlerin en fazla 0.5%'i alarm)
+Model                      Yakalama  Kesinlik    Yanlis     AUC
+1. Kural tabanli              67.4%     72.4%     0.50%   0.974
+2. Lojistik regresyon         83.9%     76.6%     0.50%   0.983
+3. Gradient boosting          82.6%     76.3%     0.50%   0.978
+Hibrit (ML + kritik kural)    82.6%     76.3%     0.50%   0.978
+
+Seviye 2 agirliklari (standartlastirilmis; + fraud'a iter):
+  yeni_alici       +1.27
+  tutar_orani      +0.77
+  aktif_cagri      +0.45
+  oturum_sn        +0.31
+  tutar_tl         +0.28
+  alici_fan_in     +0.22
+  uzaktan_erisim   +0.20
+  yeni_cihaz       -0.17
+  bakiye_orani     +0.15
+  gece             +0.10
+
+Seviye 3 ozellik onemi (permutation, AUC kaybi):
+  yeni_alici       0.071
+  tutar_orani      0.016
+  aktif_cagri      0.003
+  alici_fan_in     0.001
+  oturum_sn        0.001
+  bakiye_orani     0.001

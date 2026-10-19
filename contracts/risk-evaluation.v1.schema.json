@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RiskEvaluationRequest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "occurredAt",
+    "customerId",
+    "beneficiaryId",
+    "amountTry",
+    "isNewBeneficiary",
+    "call",
+    "remoteAccessDetected",
+    "muleFanInCount",
+    "textSignals"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "customerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "beneficiaryId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "amountTry": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000000
+    },
+    "isNewBeneficiary": {
+      "type": "boolean"
+    },
+    "call": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "isActive",
+        "source",
+        "reputation"
+      ],
+      "properties": {
+        "isActive": {
+          "type": "boolean"
+        },
+        "source": {
+          "enum": [
+            "SIMULATED",
+            "OS_SCREENING",
+            "USER_REPORTED"
+          ]
+        },
+        "reputation": {
+          "enum": [
+            "TRUSTED",
+            "UNKNOWN",
+            "SUSPICIOUS"
+          ]
+        }
+      }
+    },
+    "remoteAccessDetected": {
+      "type": "boolean"
+    },
+    "muleFanInCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "textSignals": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "SAFE_ACCOUNT",
+          "URGENCY",
+          "OTP_REQUEST",
+          "REMOTE_ACCESS_REQUEST"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Güvenli Hesap · APP Fraud Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Schibsted+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1614; --ink-2: #221d1a; --ink-3: #2c2522; --line: #3a312c;
+    --paper: #efe8dc; --muted: #a89c8c; --red: #f0475e; --red-deep: #c8213a; --gold: #e8b23a; --ok: #6fbf8a;
+    --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --sans: 'Schibsted Grotesk', -apple-system, 'Segoe UI', Arial, sans-serif;
+    --mono: 'JetBrains Mono', Consolas, monospace;
+    --side: 230px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 17px; line-height: 1.6; }
+  a { color: inherit; }
+
+  /* Sol menü */
+  aside { position: fixed; inset: 0 auto 0 0; width: var(--side); background: var(--ink-2); border-right: 1px solid var(--line); padding: 22px 16px; display: flex; flex-direction: column; z-index: 10; }
+  .brand { font-family: var(--serif); font-weight: 800; font-size: 20px; letter-spacing: .5px; }
+  .brand small { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 1.5px; margin-top: 2px; }
+  nav { margin-top: 24px; display: flex; flex-direction: column; gap: 2px; }
+  nav a { text-decoration: none; font-size: 13.5px; padding: 6px 8px; border-radius: 4px; color: var(--muted); display: flex; gap: 8px; transition: background .25s, color .25s; }
+  nav a span { font-family: var(--mono); font-size: 10.5px; opacity: .7; padding-top: 2px; }
+  nav a:hover { color: var(--paper); }
+  nav a.active { background: var(--red); color: #fff; font-weight: 600; }
+  .keys { margin-top: auto; font-size: 11.5px; color: var(--muted); line-height: 1.9; }
+  kbd { font-family: var(--mono); font-size: 10.5px; background: var(--ink-3); border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; color: var(--paper); }
+  #progress { position: fixed; top: 0; left: var(--side); right: 0; height: 3px; background: var(--red); transform-origin: left; transform: scaleX(0); z-index: 11; }
+
+  main { margin-left: var(--side); }
+  section { min-height: 100vh; padding: 12vh 7vw 10vh; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; max-width: 1180px; }
+  .label { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .label b { background: var(--red); color: #fff; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 800; line-height: 1.08; margin: 0; }
+  h1 { font-size: clamp(56px, 9vw, 120px); letter-spacing: -2px; }
+  h1 em, h2 em { font-style: normal; color: var(--red); }
+  h2 { font-size: clamp(34px, 4.6vw, 58px); letter-spacing: -1px; margin-bottom: 18px; }
+  h3 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .lead { font-size: 20px; max-width: 760px; margin: 0 0 18px; }
+  .sub { color: var(--muted); max-width: 720px; margin: 0; }
+  .rule { width: 340px; max-width: 60%; height: 5px; background: var(--red); margin: 18px 0 24px; transform-origin: left; }
+
+  .grid { display: grid; gap: 18px; margin-top: 28px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); } .g3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 20px 22px; }
+  .card.hot { background: var(--red-deep); border-color: var(--red-deep); color: #fff; }
+  .card.hot .sub, .card.hot li { color: #fff; }
+  .card ul { margin: 6px 0 0; padding-left: 20px; } .card li { margin: 5px 0; }
+  .note { border-left: 3px solid var(--gold); background: var(--ink-2); padding: 14px 18px; margin-top: 24px; color: var(--paper); max-width: 820px; font-size: 15.5px; }
+  .note b { color: var(--gold); }
+  .tiny { font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+  /* Rakamlar */
+  .stats { display: flex; flex-wrap: wrap; gap: 44px; margin-top: 30px; }
+  .stat .n { font-family: var(--serif); font-size: 52px; font-weight: 800; line-height: 1; }
+  .stat .n small { font-size: 26px; }
+  .stat .t { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 6px; max-width: 220px; }
+  .stat.red .n { color: var(--red); }
+
+  /* Kaydırınca belirme */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .d1 { transition-delay: .1s; } .d2 { transition-delay: .2s; } .d3 { transition-delay: .3s; } .d4 { transition-delay: .4s; } .d5 { transition-delay: .5s; }
+  .rule.reveal { transform: scaleX(0); } .rule.reveal.in { transform: scaleX(1); }
+
+  /* Saldırı zinciri */
+  .chain { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 26px; }
+  .link { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 16px 14px; cursor: pointer; opacity: .45; transition: opacity .35s, border-color .35s, transform .35s; text-align: left; color: inherit; font: inherit; }
+  .link .no { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .link .nm { font-family: var(--serif); font-size: 19px; font-weight: 600; margin-top: 6px; }
+  .link.done { opacity: .8; }
+  .link.on { opacity: 1; border-color: var(--red); transform: translateY(-4px); }
+  .controls { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  button.btn { font: 600 14px var(--sans); background: var(--red); color: #fff; border: 0; border-radius: 5px; padding: 9px 16px; cursor: pointer; }
+  button.btn.ghost { background: transparent; color: var(--paper); border: 1px solid var(--line); }
+  .detail { margin-top: 18px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+  .detail .card { min-height: 150px; }
+  .detail .def b { color: var(--ok); font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .fade { animation: fade .45s ease; } @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Katır hesap çizimi */
+  .mule-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; margin-top: 18px; }
+  svg.mule { width: 100%; height: auto; }
+  svg.mule .flow { stroke: var(--red); stroke-width: 2.5; fill: none; stroke-dasharray: 320; stroke-dashoffset: 320; }
+  .in svg.mule .flow { animation: draw 1.4s ease forwards; }
+  .in svg.mule .flow:nth-of-type(2) { animation-delay: .25s; } .in svg.mule .flow:nth-of-type(3) { animation-delay: .5s; } .in svg.mule .flow:nth-of-type(4) { animation-delay: .75s; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  svg.mule .freeze { opacity: 0; }
+  .in svg.mule .freeze { animation: pop .5s ease 2.2s forwards; }
+  @keyframes pop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+  svg.mule text { font-family: var(--sans); fill: var(--paper); font-size: 13px; }
+
+  /* SRE tablosu */
+  .rows { margin-top: 24px; border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 70px 1.1fr 1.3fr 1.2fr; gap: 16px; padding: 15px 4px; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .row .code { font-family: var(--mono); color: var(--red); font-size: 15px; }
+  .row .k { font-weight: 700; } .row .ex { color: var(--muted); font-size: 15px; }
+
+  /* Risk hesaplayıcı */
+  .calc { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 24px; align-items: start; }
+  .sig { display: flex; justify-content: space-between; align-items: center; width: 100%; background: var(--ink-2); border: 1px solid var(--line); border-radius: 7px; padding: 12px 16px; margin-bottom: 9px; cursor: pointer; color: inherit; font: inherit; text-align: left; transition: border-color .25s, background .25s; }
+  .sig .pt { font-family: var(--mono); color: var(--muted); }
+  .sig[aria-pressed="true"] { border-color: var(--red); background: #2d1c1e; }
+  .sig[aria-pressed="true"] .pt { color: var(--red); }
+  .gauge .score { font-family: var(--serif); font-size: 96px; font-weight: 800; line-height: 1; }
+  .bar { position: relative; height: 14px; background: var(--ink-3); border-radius: 7px; margin: 18px 0 8px; overflow: visible; }
+  .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ok); border-radius: 7px; transition: width .5s cubic-bezier(.2,.7,.2,1), background .3s; }
+  .bar .thr { position: absolute; top: -8px; bottom: -8px; width: 2px; background: var(--paper); left: calc(70 / 130 * 100%); }
+  .bar .thr::after { content: "eşik 70"; position: absolute; top: -22px; left: -22px; font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .verdict { display: inline-block; margin-top: 14px; padding: 7px 14px; border-radius: 5px; font-weight: 700; background: #1f3328; color: var(--ok); transition: background .3s, color .3s; }
+  .verdict.hold { background: var(--red); color: #fff; }
+
+  /* Zaman çizelgesi */
+  .steps { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .step .num { font-family: var(--serif); font-size: 40px; font-weight: 800; color: var(--red); line-height: 1; }
+
+  /* Önce / sonra */
+  .vs { margin-top: 24px; display: grid; grid-template-columns: 160px 1fr 1fr; gap: 10px 16px; align-items: center; }
+  .vs .h { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .vs .a, .vs .b { padding: 12px 14px; border-radius: 6px; background: var(--ink-2); }
+  .vs .b { background: #2d1c1e; border: 1px solid var(--red-deep); font-weight: 600; }
+  .vs .k { font-weight: 700; }
+
+  /* Seviyeler birlikte: akış ve karar tablosu */
+  .flow { display: grid; grid-template-columns: 1fr auto 1.5fr auto 1fr auto 1fr; gap: 10px; align-items: center; margin-top: 26px; }
+  .fbox { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; font-weight: 700; font-size: 15px; line-height: 1.3; }
+  .fbox small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .fbox.hot { border-color: var(--red); } .fbox.ghost { border-style: dashed; color: var(--muted); }
+  .fstack { display: grid; gap: 8px; }
+  .farrow { color: var(--red); font-size: 22px; font-weight: 700; }
+  .scen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 26px; }
+  .scen > span { color: var(--muted); font-size: 14px; margin-right: 4px; }
+  button.btn.ghost.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .dtp { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: grid; grid-template-columns: 40px 1fr auto auto; max-width: 900px; }
+  .dtp > div { display: contents; }
+  .dtp span { padding: 10px 12px; border-bottom: 1px solid var(--line); transition: background .35s, color .35s; }
+  .dtp > div:last-child span { border-bottom: 0; }
+  .dtp .n { font-family: var(--mono); color: var(--muted); text-align: center; }
+  .dtp .v, .dtp .res { font-family: var(--mono); font-size: 13.5px; white-space: nowrap; text-align: right; }
+  .dtp .pass span { color: var(--muted); text-decoration: line-through; text-decoration-color: #5a4f48; }
+  .dtp .skip span { color: var(--muted); }
+  .dtp .hit span { background: #2d1c1e; color: var(--paper); font-weight: 700; } .dtp .hit .res { color: var(--red); }
+  .dtp .next span { background: #33290f; color: var(--gold); }
+  .dtp .shadow span { background: var(--ink-3); color: var(--muted); font-style: italic; }
+  @media (max-width: 900px) {
+    .flow { grid-template-columns: 1fr; } .farrow { transform: rotate(90deg); justify-self: center; }
+    .dtp { grid-template-columns: 30px 1fr auto; } .dtp .v { display: none; }
+  }
+  /* Finansal zarar hesabı */
+  .fin { display: grid; grid-template-columns: 1fr 1.1fr; gap: 28px; margin-top: 14px; align-items: start; }
+  .fin-in { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .fin-in label { font-size: 13.5px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .fin-in label b { color: var(--paper); font-family: var(--mono); font-size: 14px; }
+  .fin-in input[type=range] { width: 100%; accent-color: var(--red); }
+  .fbar { display: grid; grid-template-columns: 150px 1fr auto; gap: 12px; align-items: center; margin-bottom: 10px; font-size: 14px; }
+  .fbar i { display: block; height: 18px; border-radius: 4px; background: var(--red); width: 0; transition: width .6s cubic-bezier(.2,.7,.2,1); }
+  .fbar i.after { background: var(--ok); }
+  .fbar b { font-family: var(--mono); font-size: 14px; white-space: nowrap; }
+  .fin-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .fin-kpis div { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .fin-kpis small { display: block; color: var(--muted); font-size: 12px; }
+  .fin-kpis b { font-family: var(--serif); font-size: 24px; }
+  @media (max-width: 900px) { .fin, .fin-in { grid-template-columns: 1fr; } .fbar { grid-template-columns: 1fr auto; } .fbar i { grid-column: 1 / -1; grid-row: 2; } }
+  .ok-tag, .todo-tag { font-family: var(--mono); font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; white-space: nowrap; }
+  .ok-tag { background: #1f3328; color: var(--ok); } .todo-tag { background: #33290f; color: var(--gold); }
+  .readlist { margin: 8px 0 10px; padding-left: 22px; font-size: 15.5px; line-height: 1.5; }
+  .readlist li { margin: 6px 0; }
+  .card.hot .readlist b { color: #fff; }
+  .demo-link { display: inline-block; margin-top: 22px; background: var(--red); color: #fff; text-decoration: none; font-weight: 700; padding: 13px 22px; border-radius: 6px; }
+  code { font-family: var(--mono); font-size: 14px; background: var(--ink-3); padding: 1px 6px; border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    :root { --side: 0px; }
+    aside { position: sticky; top: 0; width: 100%; inset: auto; flex-direction: row; align-items: center; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+    nav, .keys { display: none; }
+    #progress { left: 0; }
+    section { padding: 64px 16px; min-height: auto; }
+    .g2, .g3, .steps, .calc, .detail, .mule-wrap { grid-template-columns: 1fr; }
+    .chain { grid-template-columns: 1fr 1fr; }
+    .row { grid-template-columns: 54px 1fr; } .row .ex { grid-column: 2; }
+    .vs { grid-template-columns: 1fr; } .vs .h:first-child { display: none; }
+    .stats { gap: 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal, .rule.reveal { opacity: 1; transform: none; transition: none; }
+    svg.mule .flow { stroke-dashoffset: 0; animation: none !important; } svg.mule .freeze { opacity: 1; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<aside>
+  <div class="brand">Güvenli Hesap<small>APP FRAUD · SRE CASE</small></div>
+  <nav id="toc"></nav>
+  <div class="keys">
+    <kbd>j</kbd> / <kbd>k</kbd> bölüm<br>
+    <kbd>→</kbd> / <kbd>←</kbd> adım<br>
+    Veriler kurgusaldır.
+  </div>
+</aside>
+
+<main>
+<!-- 00 Kapak -->
+<section id="kapak" data-title="Kapak">
+  <div class="label reveal"><b>CASE</b> SOSYAL MÜHENDİSLİKLE PARA GÖNDERME</div>
+  <h1 class="reveal d1">Güvenli <em>Hesap.</em></h1>
+  <div class="rule reveal d2"></div>
+  <p class="lead reveal d2">“Hesabınız tehlikede, paranızı güvenli hesaba aktarın.” Bir telefon, bir havale, birkaç dakika. Bu vakayı nasıl engelleriz, yaşanırsa ne yaparız?</p>
+  <p class="sub reveal d3">SRE bakışıyla: tespit, müdahale, kök neden, önlem. Az önce Karabanka’da gördüğünüz kaybı, Akbank’ta nasıl önlediğimizi adım adım anlatacağız.</p>
+  <div class="stats reveal d4">
+    <div class="stat red"><div class="n"><span data-count="8">0</span><small>/8</small></div><div class="t">demo saldırısının hepsi para çıkmadan durduruldu</div></div>
+    <div class="stat"><div class="n"><span data-count="532">0</span><small> bin</small></div><div class="t">PaySim açık veri setindeki transferle test edildi</div></div>
+    <div class="stat"><div class="n">%<span data-count="0.5" data-dec="1">0</span></div><div class="t">normal işlemlerde izin verdiğimiz yanlış alarm</div></div>
+  </div>
+</section>
+
+<!-- 01 Vaka -->
+<section id="vaka" data-title="Seçilen vaka">
+  <div class="label reveal"><b>01</b> FRAUD VAKASI</div>
+  <h2 class="reveal d1">Kurban parayı <em>kendi eliyle</em> gönderiyor</h2>
+  <p class="lead reveal d2">Authorized Push Payment (APP), yani yetkili itme ödemesi dolandırıcılığı: dolandırıcı banka görevlisi, polis ya da Maliye çalışanı gibi arar; kurban kendi telefonundan, kendi şifresi ve OTP’siyle havaleyi kendisi yapar. Banka açısından işlem kusursuz görünür.</p>
+  <div class="grid g2">
+    <div class="card reveal d2"><h3>Fraud nedir?</h3><p class="sub">Haksız kazanç için bilerek yapılan aldatıcı veya sahte yöntemler. Çalıntı kartla işlem, hesap ele geçirme, sahte kimlikle üyelik ve şüpheli iade talepleri en yaygın türleri. Bunların çoğunda “yanlış kişi” işlem yapar ve sistem bunu yakalayabilir. Biz en zor yakalananı seçtik: işlemi doğru kişinin, kandırılarak yaptığı vakayı.</p></div>
+    <div class="card hot reveal d3"><h3>Neden zor?</h3><ul><li><b>Giriş ve OTP meşru:</b> doğru cihaz, doğru şifre; klasik güvenlik kontrolleri sorun görmez.</li><li><b>İşlemi müşteri kendisi onaylıyor:</b> hukuken ve teknik olarak “yetkili” bir ödeme.</li><li><b>Saldırı bankanın dışında başlıyor:</b> manipülasyon telefonda olur, banka konuşmayı göremez.</li><li><b>Para dakikalar içinde dağılıyor:</b> katır hesaplardan bölünüp çekilir, sonradan geri almak çoğu zaman imkânsızdır.</li></ul></div>
+  </div>
+</section>
+
+<!-- Taktikler -->
+<section id="taktik" data-title="6 taktik">
+  <div class="label reveal"><b>02</b> SAHNE 1’DE NE OLDU?</div>
+  <h2 class="reveal d1">90 saniyede <em>6 manipülasyon</em> taktiği</h2>
+  <p class="sub reveal d2">Arayan hiçbir teknik açık kullanmadı, hiçbir şifre çalmadı. Sadece insan psikolojisini kullandı. Bu altı taktiği tanımak, çözümümüzün neden tek bir sinyale değil sinyallerin birleşimine baktığını açıklıyor.</p>
+  <div class="grid g3">
+    <div class="card reveal d1"><div class="stat red"><div class="n">1</div></div><h3 style="margin-top:8px">Otorite</h3><p class="sub">“Maliye’den arıyorum”, sicil numarası, “görüşme kayıt altında”. Resmî kurum adı ve bürokratik dil, karşıdakini sorgulamadan dinlemeye iter.</p></div>
+    <div class="card reveal d2"><div class="stat red"><div class="n">2</div></div><h3 style="margin-top:8px">Güven tuzağı</h3><p class="sub">Önce para istemiyor, para veriyor: “12.400 TL vergi iadeniz var”. Kazanç vaadiyle başlayan konuşmada kurbanın savunması düşer.</p></div>
+    <div class="card reveal d3"><div class="stat red"><div class="n">3</div></div><h3 style="margin-top:8px">Açgözlülük</h3><p class="sub">“Üç ayda %40 getiri, ana para devlet garantili.” Gerçek dışı getiri, riski görmeyi zorlaştırır; “devlet garantisi” şüpheyi bastırır.</p></div>
+    <div class="card reveal d1"><div class="stat red"><div class="n">4</div></div><h3 style="margin-top:8px">Aciliyet</h3><p class="sub">“Kontenjan bugün 17:00’de kapanıyor.” Düşünmeye, birine danışmaya ya da bankayı aramaya zaman bırakmaz.</p></div>
+    <div class="card reveal d2"><div class="stat red"><div class="n">5</div></div><h3 style="margin-top:8px">Kaybetme korkusu</h3><p class="sub">“Katılmazsanız iadeniz Hazine’ye gelir yazılır.” İnsanlar kazanmaktan çok kaybetmemek için hareket eder; bu cümle onu kullanır.</p></div>
+    <div class="card hot reveal d3"><div class="stat"><div class="n">6</div></div><h3 style="margin-top:8px">İzolasyon ve yalan</h3><p class="sub">“Bankanız sorarsa ‘yakınıma destek’ deyin, bankalar bu fonu sevmez.” Kurbanı bankasına karşı konumlar. Sahne 2’nin kilit noktasıydı: kurban bankaya yalan söyledi, sistem yine de yakaladı.</p></div>
+  </div>
+</section>
+
+<!-- 02 Zincir -->
+<section id="zincir" data-title="Saldırı zinciri">
+  <div class="label reveal"><b>03</b> VAKA NASIL İŞLİYOR</div>
+  <h2 class="reveal d1">Beş halka, <em>beş savunma</em> noktası</h2>
+  <p class="sub reveal d2">Halkaya tıklayın ya da <kbd>→</kbd> tuşuna basın. Saldırı beş adımda ilerler ve her adımda onu kesebileceğimiz bir nokta var. Asıl müdahale noktamız üçüncü halka: para gitmeden önce, havale anında. Ondan önceki halkalar farkındalık, sonrakiler hasar azaltma işidir.</p>
+  <div class="chain reveal d3" id="chain"></div>
+  <div class="controls reveal d3">
+    <button class="btn" id="chainNext">Sonraki halka →</button>
+    <button class="btn ghost" id="chainReset">Baştan</button>
+    <button class="btn ghost" id="chainPlay">▶ Saldırıyı akıt</button>
+  </div>
+  <div class="detail reveal d4">
+    <div class="card" id="chainAtk"></div>
+    <div class="card def" id="chainDef"></div>
+  </div>
+</section>
+
+<!-- 03 Katır hesap -->
+<section id="katir" data-title="Katır hesap">
+  <div class="label reveal"><b>04</b> PARANIN GİTTİĞİ YER</div>
+  <h2 class="reveal d1">Katır hesap: <em>izi kaybettiren</em> ara durak</h2>
+  <div class="mule-wrap">
+    <div>
+      <h3 class="reveal d2">Katır hesap nedir?</h3>
+      <p class="lead reveal d2">Dolandırıcılık parasının üzerinden geçirildiği ara hesap. Para gelir, dakikalar içinde birkaç hesaba bölünür, nakde ya da kriptoya çevrilir; böylece iz kaybolur. Parayı durdurabileceğimiz son yer burasıdır.</p>
+      <div class="card reveal d3"><h3>Hesap sahibi kim?</h3><ul><li><b>Bilinçli:</b> komisyon karşılığı hesabını kullandırır, “IBAN kiralama” ilanları buna örnek.</li><li><b>Bilinçsiz:</b> “evden kolay iş” ilanıyla kandırılmış, suça ortak olduğunu bilmeyen kişi.</li><li><b>Sahte ya da ele geçirilmiş hesap:</b> çalıntı kimlikle açılmış veya şifresi çalınmış hesap.</li></ul></div>
+      <div class="note reveal d4"><b>Tespit sinyali (fan-in):</b> 30 dakikada, ilk kez para gönderen 4 farklı kişiden 20 bin TL üzeri giriş varsa hesap katır adayıdır ve dondurulur. Normal bir kişisel hesap kısa sürede birbirini tanımayan bu kadar kişiden yüksek tutar almaz. Bu sinyali tek bir müşterinin işleminde göremezsiniz; birçok işleme aynı anda bakan SRE paneli yakalar.</div>
+    </div>
+    <div class="reveal d2" id="muleBox">
+      <svg class="mule" viewBox="0 0 420 260" role="img" aria-label="Dört kurbandan katır hesaba akan para ve hesabın dondurulması">
+        <path class="flow" d="M70 40 C 200 40, 220 130, 320 130"/>
+        <path class="flow" d="M70 100 C 200 100, 220 130, 320 130"/>
+        <path class="flow" d="M70 160 C 200 160, 220 130, 320 130"/>
+        <path class="flow" d="M70 220 C 200 220, 220 130, 320 130"/>
+        <g fill="#2c2522" stroke="#3a312c">
+          <circle cx="50" cy="40" r="20"/><circle cx="50" cy="100" r="20"/><circle cx="50" cy="160" r="20"/><circle cx="50" cy="220" r="20"/>
+        </g>
+        <text x="44" y="45">K1</text><text x="44" y="105">K2</text><text x="44" y="165">K3</text><text x="44" y="225">K4</text>
+        <circle cx="350" cy="130" r="34" fill="#c8213a"/>
+        <text x="330" y="135" style="font-weight:700">M901</text>
+        <g class="freeze" style="transform-origin:350px 130px">
+          <rect x="300" y="182" width="100" height="28" rx="5" fill="#efe8dc"/>
+          <text x="317" y="201" style="fill:#1a1614;font-weight:700">DONDUR</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 04 Engelleme -->
+<section id="cozum" data-title="Engelleme çözümü">
+  <div class="label reveal"><b>05</b> ENGELLEMEK İÇİN ÇÖZÜM</div>
+  <h2 class="reveal d1">SRE gereksinimleri, <em>tek tek</em></h2>
+  <h3 class="reveal d2">SRE nedir ve burada ne yapar?</h3>
+  <p class="sub reveal d2">SRE, sistemin güvenilir ve izlenebilir çalışmasını sağlar. Bunun için aşağıdaki gereksinimleri sırayla uyguluyoruz.</p>
+  <div class="rows">
+    <div class="row reveal d1"><span class="code">4a</span><span class="k">Logları topluyoruz</span><span>Olayı görünür kılmak için</span><span class="ex">alıcı, tutar, bakiye, cihaz, aktif çağrı, skor, karar</span></div>
+    <div class="row reveal d2"><span class="code">4b</span><span class="k">Metrikleri belirliyoruz</span><span>Normal ile anormal işlemi ayırmak için</span><span class="ex">riskli işlem oranı, HOLD sayısı, katır sinyali, yanlış alarm</span></div>
+    <div class="row reveal d3"><span class="code">4c</span><span class="k">Alarm kriterleri belirliyoruz</span><span>Ne zaman müdahale edeceğimizi bilmek için</span><span class="ex">işlem: skor ≥ 70 → HOLD · sistem: riskli oran ≥ %2 → nöbetçiye alarm</span></div>
+    <div class="row reveal d4"><span class="code">3a</span><span class="k">Otomasyon kullanıyoruz</span><span>Gecikmeden aksiyon almak için</span><span class="ex">işlemi bekletme (HOLD), katır hesabı dondurma</span></div>
+    <div class="row reveal d5"><span class="code">3b</span><span class="k">CI/CD ile yayınlıyoruz</span><span>Kural değişikliklerini güvenle uygulamak için</span><span class="ex">test et, önce gölge modda dene, kontrollü yayınla</span></div>
+  </div>
+  <p class="tiny reveal">Kullanıcı tarafı: uygulamada “banka sizden asla para aktarmanızı istemez” uyarı ekranı ve farkındalık kampanyası. Teknoloji tek başına yetmez, müşteri de neye dikkat edeceğini bilmeli.</p>
+</section>
+
+<!-- 05 Risk skoru -->
+<section id="skor" data-title="Risk skoru">
+  <div class="label reveal"><b>06</b> ALARM KRİTERİ</div>
+  <h2 class="reveal d1">Skoru <em>siz</em> hesaplayın</h2>
+  <h3 class="reveal d2">Risk skoru nasıl çalışır?</h3>
+  <p class="sub reveal d2">Tek bir sinyal yeterli değildir. Yeni alıcı ve yüksek tutar birlikte 55 puan eder. Aktif telefon görüşmesi de eklenince skor 80'e çıkar, 70 eşiğini geçer ve işlem bekletilir.</p>
+  <div class="calc">
+    <div class="reveal d2" id="signals"></div>
+    <div class="gauge reveal d3">
+      <div class="score" id="score">0</div>
+      <div class="bar"><i id="barFill"></i><span class="thr"></span></div>
+      <div class="verdict" id="verdict">Onay: işlem geçer</div>
+      <p class="tiny">Sahne 1’deki işlem: yeni alıcı 30 + yüksek tutar 25 + aktif çağrı 25 = 80. Puanlar başlangıç referansıdır (v1); gerçek banka verisiyle yeniden ayarlanır. Riskli işlem oranı %2’yi aşarsa SRE ekibine ayrıca alarm gider.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 Üç seviye -->
+<section id="seviye" data-title="Skorun üç seviyesi">
+  <div class="label reveal"><b>07</b> SKOR NASIL GELİŞİR</div>
+  <h2 class="reveal d1">Kuraldan <em>makine öğrenmesine</em></h2>
+  <h3 class="reveal d2">Neden makine öğrenmesi kullanıyoruz?</h3>
+  <p class="sub reveal d2">Kurallar hızlı ve açıklanabilirdir. Makine öğrenmesi ise gözden kaçabilecek ince örüntüleri yakalayarak kuralları destekler. Ekrandaki oranlar sentetik test sonuçlarıdır.</p>
+  <div class="grid g3">
+    <div class="card reveal d2"><div class="stat red"><div class="n">%<span data-count="67">0</span></div></div><h3 style="margin-top:12px">1 · Kural tabanlı sistem</h3><p class="sub">Önceden belirlediğimiz kurallara göre puan verir. Neden alarm oluşturduğu kolayca anlaşılır ancak yeni dolandırıcılık yöntemlerini kendi başına öğrenemez.</p></div>
+    <div class="card reveal d3"><div class="stat red"><div class="n">%<span data-count="84">0</span></div></div><h3 style="margin-top:12px">2 · Öğrenen model</h3><p class="sub">Geçmiş işlemleri inceleyerek hangi işaretlerin daha riskli olduğunu öğrenir. Böylece herkese aynı kuralları uygulamak yerine işleme göre daha doğru değerlendirme yapar.</p></div>
+    <div class="card reveal d4"><div class="stat red"><div class="n">%<span data-count="83">0</span></div></div><h3 style="margin-top:12px">3 · Gelişmiş model</h3><p class="sub">Birçok küçük kararın sonucunu birleştirerek karmaşık durumları yakalamaya çalışır. Güçlüdür ancak açıklaması daha zordur. Bu nedenle şimdilik karar vermiyor, sistemi arka planda kontrol ediyor.</p></div>
+  </div>
+  <p class="tiny reveal">Rakamlar fraud yakalama oranıdır. Kurgusal veri: <code>demo/risk_models.py</code></p>
+</section>
+
+<!-- 07 Seviyeler birlikte -->
+<section id="birlikte" data-title="Seviyeler birlikte">
+  <div class="label reveal"><b>08</b> ÜÇ SEVİYE BİRLİKTE</div>
+  <h2 class="reveal d1">İşlem üç adımda <em>kontrol edilir</em></h2>
+  <h3 class="reveal d2">Sistem kararı nasıl veriyor?</h3>
+  <p class="sub reveal d2">Önce işlem bilgilerine bakılır. Açık bir risk varsa işlem bekletilir, şüphe varsa müşteriden ek doğrulama istenir. Risk görülmezse işlem onaylanır. Son kararı hiçbir model tek başına vermez.</p>
+  <div class="flow reveal d2">
+    <div class="fbox">İşlem bilgileri<small>tutar, alıcı, bakiye ve cihaz</small></div><span class="farrow">→</span>
+    <div class="fstack">
+      <div class="fbox hot">1 · Kurallara bak<small>belirgin risk varsa işlemi beklet</small></div>
+      <div class="fbox">2 · Geçmişle karşılaştır<small>şüphe varsa ek doğrulama iste</small></div>
+      <div class="fbox ghost">3 · Arka planda kontrol et<small>sonucu kaydet, karara karışma</small></div>
+    </div><span class="farrow">→</span>
+    <div class="fbox">Sonucu belirle<small>ilk eşleşen güvenlik adımını uygula</small></div><span class="farrow">→</span>
+    <div class="fbox">Onay · Ek kontrol · Beklet</div>
+  </div>
+  <div class="scen reveal d3"><span>Senaryo:</span>
+    <button class="btn ghost" type="button" data-scen="hold">Telefon görüşmesi sırasında</button>
+    <button class="btn ghost" type="button" data-scen="verify">Bütün bakiyeyi gönderme</button>
+    <button class="btn ghost" type="button" data-scen="ok">Günlük transfer</button>
+  </div>
+  <div class="dtp reveal d3" id="dtp">
+    <div data-row="1"><span class="n">1</span><span>Kural skoru ≥ 70</span><span class="v"></span><span class="res">HOLD</span></div>
+    <div data-row="2"><span class="n">2</span><span>Lojistik olasılık ≥ %32</span><span class="v"></span><span class="res">Ek doğrulama</span></div>
+    <div data-row="3"><span class="n">3</span><span>Müşteri “evet / emin değilim” der ya da çağrı sürer</span><span class="v"></span><span class="res">HOLD</span></div>
+    <div data-row="4"><span class="n">4</span><span>Diğer durumlar</span><span class="v"></span><span class="res">Onay</span></div>
+    <div data-row="G" class="shadow"><span class="n">G</span><span>Gradient boosting (gölge mod)</span><span class="v"></span><span class="res">sadece log</span></div>
+  </div>
+  <p class="tiny" id="dtpWhy"></p>
+  <div class="grid g2">
+    <div class="card reveal d2"><h3>Neden ağırlıklı ortalama değil?</h3><ul><li><b>Ölçekler farklı:</b> 0–130 arası puan ile 0–1 arası olasılık toplanınca anlamsız bir sayı çıkar.</li><li><b>Açıklanabilirlik:</b> müşteri ya da denetçi “neden durdu?” diye sorduğunda net bir cevap gerekir.</li><li><b>Sorumluluk:</b> bir model tek başına müşterinin parasını dondurmamalı; model sorar, kural durdurur.</li><li><b>Hız:</b> yeni saldırıya kural aynı gün eklenir, modelin yeniden eğitilmesi haftalar sürer.</li></ul></div>
+    <div class="card reveal d3"><h3>Gölge mod</h3><ul><li><b>Risksiz deneme:</b> yeni model canlı trafikte puan üretir ama karara etki etmez.</li><li><b>Ölçerek karar:</b> skoru loglanır, eski modelle aynı işlemler üzerinde kıyaslanır; uyuşmazlıklar SRE panelinde sayılır.</li><li><b>Terfi:</b> kendini kanıtlarsa karar tablosunun 2. satırına katılır.</li><li><b>Ölçek:</b> hacim artarsa ağır model sadece gri bölgede (skor 40–69) çalıştırılır.</li></ul></div>
+  </div>
+  <p class="lead reveal" style="margin-top:28px">Kurallar durdurur, model sorar, müşterinin cevabı kararı tamamlar.</p>
+</section>
+
+<!-- 08 PaySim -->
+<section id="paysim" data-title="Açık veride test">
+  <div class="label reveal"><b>09</b> AÇIK VERİ SETİ</div>
+  <h2 class="reveal d1">PaySim'de test: <em>dürüst</em> sonuç</h2>
+  <p class="sub reveal d2">Modelleri kurgusal veriyle değil, herkesin indirip doğrulayabileceği açık bir veri setiyle de test ettik. 532 bin para transferi, %1,4’ü fraud. Zamana göre böldük: ilk %70 ile eğittik, son %30’u hiç görmeden test ettik, yani geçmişten geleceği tahmin ettik. Üç yaklaşımı aynı yanlış alarm oranında (%0,5) kıyasladık.</p>
+  <div class="stats reveal d3">
+    <div class="stat red"><div class="n">%<span data-count="95">0</span></div><div class="t">kural tabanlı · elle ayarlı puanlar</div></div>
+    <div class="stat red"><div class="n">%<span data-count="100">0</span></div><div class="t">lojistik regresyon · öğrenilmiş ağırlıklar</div></div>
+    <div class="stat red"><div class="n">%<span data-count="100">0</span></div><div class="t">gradient boosting · 60 ağaç</div></div>
+  </div>
+  <div class="flow reveal d3" style="margin-top:22px">
+    <div class="fbox">PaySim CSV<small>Kaggle · 6,3 milyon sentetik işlem</small></div><span class="farrow">→</span>
+    <div class="fbox">Python eğitimi<small>532 bin TRANSFER · %70 eğitim / %30 test</small></div><span class="farrow">→</span>
+    <div class="fbox">data.js<small>ağırlıklar + 60 ağaç + 200 etiketli örnek</small></div><span class="farrow">→</span>
+    <div class="fbox hot">Uygulama<small>risk motoru · veri seti oynatma · SRE trafiği</small></div>
+  </div>
+  <div class="note reveal d4"><b>Dikkat, gerçek dünyaya göre iyimser.</b> Fraud'ların %96'sı bakiyenin tamamını gönderiyor, normallerde neredeyse hiç yok. APP'ye uygun bir sinyal (“tüm paranızı aktarın”), ama bu kadar keskin ayrım simülatörün özelliği. Sinyal çıkarılınca yakalama <b>%27-28</b>'e düşüyor. Ders: tek sinyale güvenme, cihaz ve çağrı sinyalleri şart.</div>
+  <p class="tiny reveal">Kod: <code>demo/paysim_models.py</code></p>
+</section>
+
+<!-- 09 Teknik analiz -->
+<section id="teknik" data-title="Teknik analiz">
+  <div class="label reveal"><b>10</b> TEKNİK ANALİZ</div>
+  <h2 class="reveal d1">Karar <em>ödeme gitmeden önce</em>, sunucuda</h2>
+  <p class="sub reveal d2">Telefon sinyal toplar, karar banka sunucusunda verilir. İstemci puanı değiştirerek kontrolü aşamaz; tutar, bakiye ve alıcı geçmişi sunucuda doğrulanır.</p>
+  <div class="flow reveal d2">
+    <div class="fbox">Mobil uygulama<small>çağrı var/yok, ekran paylaşımı</small></div><span class="farrow">→</span>
+    <div class="fstack">
+      <div class="fbox">Banka API<small>tutar, bakiye, alıcı geçmişi doğrulanır</small></div>
+      <div class="fbox hot">Risk motoru<small>kurallar + 2 model · ~2 µs / işlem</small></div>
+    </div><span class="farrow">→</span>
+    <div class="fbox">Karar<small>onay · ek doğrulama · HOLD</small></div><span class="farrow">→</span>
+    <div class="fbox">Ödeme sistemi / güvenlik hattı<small>+ SRE: log, metrik, alarm</small></div>
+  </div>
+
+  <h3 class="reveal" style="margin-top:34px">Sinyaller: nereden gelir, gerçekte mümkün mü?</h3>
+  <div class="rows">
+    <div class="row reveal d1"><span class="code">+25</span><span class="k">Aktif çağrı</span><span>Cihaz · yalnızca “arama var/yok” bayrağı; ses, numara ve konuşma içeriği alınmaz. Kurbanların çoğu işlemi dolandırıcıyla konuşurken yapar</span><span class="ex">Android: izinli çağrı durumu · iOS: CXCallObserver · demoda simülasyon</span></div>
+    <div class="row reveal d2"><span class="code">+30</span><span class="k">Yeni alıcı</span><span>Sunucu · müşterinin bu alıcıya daha önce para gönderip göndermediği</span><span class="ex">Bankanın kendi verisi, ek izin gerekmez; dolandırıcı her zaman yeni bir hesaba yönlendirir</span></div>
+    <div class="row reveal d3"><span class="code">+25</span><span class="k">Yüksek tutar</span><span>Sunucu · 20.000 TL eşiği; ayrıca tutarın bakiyeye oranı ve müşterinin normal havale tutarına göre katı</span><span class="ex">Sahnede: bakiyenin %85’i, normalin 17 katı</span></div>
+    <div class="row reveal d4"><span class="code">+20</span><span class="k">Uzaktan erişim</span><span>Cihaz · ekran paylaşımı veya kaydı açık mı; dolandırıcı “size yardım edeyim” diyerek uzaktan erişim uygulaması kurdurur</span><span class="ex">iOS: UIScreen.isCaptured · Android: ekran yakalama tespiti</span></div>
+    <div class="row reveal d5"><span class="code">+30</span><span class="k">Katır hesap</span><span>Sunucu · alıcıya 30 dk’da ≥ 4 farklı yeni gönderici; birçok işleme aynı anda bakılarak bulunur</span><span class="ex">SRE panelinde canlı; alıcı banka ile paylaşılabilir</span></div>
+  </div>
+
+  <h3 class="reveal" style="margin-top:34px">Dolandırıcı nasıl atlatmaya çalışır, biz ne yaparız?</h3>
+  <div class="grid g3">
+    <div class="card reveal d1"><h3>“Bankan sorarsa hayır de”</h3><p class="sub">Tek cevaba güvenilmez: kural skoru 70’i geçtiyse cevap ne olursa olsun HOLD. <b>Demoda var.</b></p></div>
+    <div class="card reveal d2"><h3>“Önce aramayı kapat”</h3><p class="sub">Çağrı sinyali kaybolur. Öneri: son 10 dakikada biten bilinmeyen arama da sinyal sayılsın. <b>Öneri.</b></p></div>
+    <div class="card reveal d3"><h3>İkinci telefondan arama</h3><p class="sub">Çağrı görünmez; yeni alıcı + tutar 55 puan, model ek doğrulama ister. <b>Demoda var.</b></p></div>
+    <div class="card reveal d1"><h3>Tutarı bölmek</h3><p class="sub">Her havale eşiğin altında kalır. Öneri: aynı alıcıya kısa sürede kümülatif tutar ve hız kuralı. <b>Öneri.</b></p></div>
+    <div class="card reveal d2"><h3>Her kurbana yeni katır</h3><p class="sub">Fan-in yakalamaz. Öneri: alıcı hesabın yaşı ve bankalar arası katır listesi. <b>Öneri.</b></p></div>
+    <div class="card reveal d3"><h3>Yeni kural masumları vurursa</h3><p class="sub">Yeni model/kural önce gölge modda; yanlış alarm oranı SRE’de izlenir. <b>Demoda var.</b></p></div>
+  </div>
+  <div class="note reveal"><b>Sınırlar:</b> veriler sentetik (PaySim + kurgusal sahne), gerçek banka entegrasyonu ve telefon API’si yok. Model sonuçları yaklaşımların farkını gösterir, banka performansı iddiası değildir. Süre Node.js’te demo modeliyle ölçüldü; gerçekte ağ ve veri çekme süresi baskın olur.</div>
+</section>
+
+<!-- Önleyici kontroller -->
+<section id="onleyici" data-title="Önleyici kontroller">
+  <div class="label reveal"><b>11</b> ÖNLEYİCİ KONTROLLER</div>
+  <h2 class="reveal d1">Para <em>çıkmadan önce</em> dört katman</h2>
+  <p class="sub reveal d2">Önleyici kontrol, zarar oluşmadan önce devreye giren kontroldür. Dört katman birbirini tamamlar: biri atlatılırsa diğeri yakalar. Her kontrol bir taktiğe cevap verir. Yeşil: demoda çalışıyor. Sarı: yol haritası önerisi.</p>
+  <div class="grid g2">
+    <div class="card reveal d1"><h3>1 · İşlem anında</h3><ul>
+      <li>Canlı risk puanı müşteri tıkladıkça güncellenir; eşik 70 aşılınca para gönderilmez (HOLD) <span class="ok-tag">demoda</span></li>
+      <li>Kural eşiği aşıldıysa müşterinin “hayır” cevabı kararı değiştirmez; izolasyon taktiğine (“bankana hayır de”) cevap <span class="ok-tag">demoda</span></li>
+      <li>Kural eşiği aşılmadı ama model riskli bulduysa müşteriye iki kısa soru sorulur; masum müşteri yolunu kesintisiz sürdürür <span class="ok-tag">demoda</span></li>
+      <li>Yeni alıcıya ilk yüksek transferde kısa bekleme süresi; aciliyet taktiğini boşa çıkarır <span class="todo-tag">öneri</span></li>
+    </ul></div>
+    <div class="card reveal d2"><h3>2 · Müşteriyi resmî kanala taşı</h3><ul>
+      <li>“PARA GÖNDERİLMEDİ, görüşmeyi kapatın” uyarısı; dolandırıcının kurban üzerindeki kontrolünü kırar <span class="ok-tag">demoda</span></li>
+      <li>“Bankamı ara”: müşteri bankayı uygulama içinden, kimliği doğrulanmış olarak arar; sahte numaraya yönlendirilemez <span class="ok-tag">demoda</span></li>
+      <li>Alıcı isim doğrulama: IBAN’ın sahibi “Kalkınma Fonu” değil bir şahıssa müşteri uyarılır <span class="todo-tag">öneri</span></li>
+    </ul></div>
+    <div class="card reveal d3"><h3>3 · Alıcı tarafı</h3><ul>
+      <li>Katır hesap tespiti: 30 dk’da ≥ 4 farklı yeni gönderici; saldırı dalgasını yakalar <span class="ok-tag">demoda</span></li>
+      <li>Tespit edilen hesaba girişler otomatik dondurulur ve karşı bankaya bildirilir <span class="ok-tag">demoda</span></li>
+      <li>Yeni açılmış hesaplara ek dikkat ve bankalar arası ortak katır listesi; her kurbana yeni katır açılmasına karşı <span class="todo-tag">öneri</span></li>
+    </ul></div>
+    <div class="card reveal d4"><h3>4 · Sistemin kendisi</h3><ul>
+      <li>Yeni model önce gölge modda çalışır; masum müşterileri bekletmeden ölçülür <span class="ok-tag">demoda</span></li>
+      <li>Riskli işlem oranı %2’yi geçince alarm; yanlış alarm ve gölge uyuşmazlığı da izlenir <span class="ok-tag">demoda</span></li>
+      <li>Kurallar kod olarak tutulur, otomatik testten geçmeden yayına çıkmaz (CI/CD) <span class="todo-tag">öneri</span></li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 11 Vaka sonrası -->
+<section id="sonra" data-title="Vaka yaşanırsa">
+  <div class="label reveal"><b>12</b> VAKA YAŞANIRSA</div>
+  <h2 class="reveal d1">Alarmdan <em>iyileştirmeye</em> altı adım</h2>
+  <p class="sub reveal d2">Önleme hiçbir zaman %100 değildir. SRE yaklaşımında amaç, bir vaka yaşandığında hızlı tespit etmek, zararı sınırlamak ve aynı şeyin bir daha olmaması için sistemi değiştirmektir.</p>
+  <div class="steps">
+    <div class="card step reveal d1"><div class="num">1</div><h3>Tespit</h3><p class="sub">Alarm tetiklenir, nöbetçi ekip bilgilenir. Müşteri şikâyetini beklemeden, işlem anında. Ne kadar erken, o kadar az zarar.</p></div>
+    <div class="card step reveal d2"><div class="num">2</div><h3>Etki analizi</h3><p class="sub">Kaç müşteri etkilendi, ne kadar tutar söz konusu, para hangi hesaplara gitti? SRE panelindeki log ve zaman çizelgesi bu soruların cevabıdır.</p></div>
+    <div class="card step reveal d3"><div class="num">3</div><h3>Acil aksiyon</h3><p class="sub">Bekleyen işlemi durdur, katır hesapları dondur, karşı bankaya bildir, müşteriyi resmî kanaldan ara ve bilgilendir.</p></div>
+    <div class="card step reveal d1"><div class="num">4</div><h3>Kök neden</h3><p class="sub">Kural neden yakalamadı? Eşik mi yanlıştı, bir sinyal mi eksikti, yoksa süreç mi aksadı? Kişiyi değil sistemi sorgula.</p></div>
+    <div class="card step reveal d2"><div class="num">5</div><h3>Postmortem</h3><p class="sub">Suçlu aramadan yazılı rapor: zaman çizelgesi, tespit süresi (MTTD), çözüm süresi (MTTR) ve ne öğrendik.</p></div>
+    <div class="card step reveal d3"><div class="num">6</div><h3>İyileştirme</h3><p class="sub">Yeni kural ya da eşik (önce gölge modda), yeni metrik, nöbetçi için adım adım runbook ve müşteri farkındalık kampanyası.</p></div>
+  </div>
+</section>
+
+<!-- 12 Kök neden -->
+<section id="kok" data-title="Kök neden">
+  <div class="label reveal"><b>13</b> BLAMELESS POSTMORTEM</div>
+  <h2 class="reveal d1">Kişiyi değil, <em>sistemi</em> sorgula</h2>
+  <p class="sub reveal d2">Blameless postmortem: “kim hata yaptı?” yerine “sistem neden izin verdi?” diye sorarız. Örnek olarak Sahne 1’deki Karabanka vakasının analizi:</p>
+  <div class="grid g2">
+    <div class="card reveal d2"><h3>Neden yakalanmadı?</h3><ul><li><b>Kural yoktu:</b> yeni alıcıya bakiyenin %85’i gitti, hiçbir kontrol tetiklenmedi.</li><li><b>Sinyal yoktu:</b> işlem sırasında telefon görüşmesi sürdüğü bilinmiyordu, loglanmıyordu.</li><li><b>Alıcı izlenmiyordu:</b> aynı hesaba aynı saatte başka kurbanlardan da para geliyordu.</li><li><b>Alarm yoktu:</b> banka olayı saatler sonra müşterinin şikâyetiyle öğrendi.</li></ul></div>
+    <div class="card hot reveal d3"><h3>Önlem aksiyonları</h3><ul><li><b>Risk skoru ve HOLD kuralı:</b> testten geçirilip CI/CD ile yayına alınır.</li><li><b>Yeni log alanları ve metrikler:</b> çağrı durumu, ekran paylaşımı, riskli işlem oranı.</li><li><b>Katır hesap alarmı:</b> fan-in tespiti ve otomatik dondurma.</li><li><b>İnsan tarafı:</b> nöbetçi runbook’u, düzenli tatbikat, müşteriye uyarı ekranı ve “Bankamı ara”.</li></ul></div>
+  </div>
+</section>
+
+<!-- 13 Önce sonra -->
+<section id="kazanim" data-title="Önce ve sonra">
+  <div class="label reveal"><b>14</b> KAZANIM</div>
+  <h2 class="reveal d1">Önce ve <em>sonra</em></h2>
+  <div class="vs">
+    <span class="h"></span><span class="h reveal">Önce (kurgusal başlangıç)</span><span class="h reveal">Sonra (demodaki davranış)</span>
+    <span class="k reveal d1">Tespit</span><span class="a reveal d1">Müşteri şikâyetiyle, saatler sonra; para çoktan gitmiş</span><span class="b reveal d2">İşlem anında, para çıkmadan; sistem seviyesinde otomatik alarm</span>
+    <span class="k reveal d2">Müdahale</span><span class="a reveal d2">Manuel, geç; katır hesap çoktan boşalmış</span><span class="b reveal d3">Otomatik HOLD, katır hesap dondurma, müşteri resmî kanala yönlendirilir</span>
+    <span class="k reveal d3">Korunan tutar</span><span class="a reveal d3">Çoğunlukla geri alınamaz; zarar müşteri ve bankada kalır</span><span class="b reveal d4">Demoda dolandırıcılık işlemlerinin hepsi para çıkmadan durduruldu</span>
+    <span class="k reveal d4">Öğrenme</span><span class="a reveal d4">Kayıt yok, aynı vaka tekrar yaşanır</span><span class="b reveal d5">Zaman çizelgesi, postmortem ve gölge modda denenen yeni kural</span>
+  </div>
+</section>
+
+<!-- 14 Finansal zarar analizi -->
+<section id="finans" data-title="Finansal zarar">
+  <div class="label reveal"><b>15</b> FİNANSAL ZARAR ANALİZİ</div>
+  <h2 class="reveal d1">90 saniyede <em>85.000 TL</em>: kim öder?</h2>
+  <div class="grid g3">
+    <div class="card reveal d1"><div class="stat red"><div class="n">%<span data-count="85">0</span></div></div><h3 style="margin-top:10px">Müşteri</h3><p class="sub">Sahne 1’de birikimin %85’i gitti. Para dakikalar içinde katır hesaplardan çıkar; geri alma ihtimali düşüktür.</p></div>
+    <div class="card reveal d2"><div class="stat"><div class="n">%<span data-count="59">0</span></div></div><h3 style="margin-top:10px">Banka (İngiltere 2024)</h3><p class="sub">450,7 milyon £ APP kaybının %59’unu bankalar geri ödedi. Ekim 2024’ten beri £85.000’e kadar geri ödeme zorunlu.</p></div>
+    <div class="card hot reveal d3"><div class="stat"><div class="n">%<span data-count="50">0</span></div></div><h3 style="margin-top:10px">Alıcı banka</h3><p class="sub">İngiltere’de geri ödeme gönderen ve alıcı banka arasında yarı yarıya. Katır hesabı yakalamak doğrudan para demek.</p></div>
+  </div>
+  <p class="tiny reveal">Kaynak: UK Finance Annual Fraud Report 2025; PSR APP geri ödeme kuralları (7 Ekim 2024). Türkiye için kamuya açık toplam APP kaybı bulamadık; aşağıdaki hesap varsayımlarla çalışır.</p>
+
+  <h3 class="reveal" style="margin-top:30px">Yıllık etki hesabı <span class="tiny">(tüm girdiler varsayım, değiştirilebilir)</span></h3>
+  <div class="scen reveal"><span>Yakalama senaryosu:</span>
+    <button class="btn ghost" type="button" data-fin="27">Kötümser %27</button>
+    <button class="btn ghost on" type="button" data-fin="60">Beklenen %60</button>
+    <button class="btn ghost" type="button" data-fin="84">İyimser %84</button>
+  </div>
+  <div class="fin reveal">
+    <div class="fin-in">
+      <label>Yıllık APP vakası <b id="vCases"></b><input type="range" id="fCases" min="100" max="10000" step="100" value="1000"></label>
+      <label>Vaka başı ortalama kayıp <b id="vLoss"></b><input type="range" id="fLoss" min="5000" max="300000" step="5000" value="85000"></label>
+      <label>Sonradan geri alınabilen pay <b id="vRec"></b><input type="range" id="fRec" min="0" max="50" step="1" value="5"></label>
+      <label>Sistemin yakaladığı pay <b id="vCatch"></b><input type="range" id="fCatch" min="0" max="100" step="1" value="60"></label>
+      <label>Bankanın üstlendiği pay <b id="vBank"></b><input type="range" id="fBank" min="0" max="100" step="5" value="50"></label>
+      <label>Yıllık havale sayısı <b id="vVol"></b><input type="range" id="fVol" min="1" max="100" step="1" value="20"></label>
+      <label>Yanlış alarm oranı <b id="vFp"></b><input type="range" id="fFp" min="0" max="20" step="1" value="5"></label>
+      <label>Yanlış alarm başına maliyet <b id="vFpc"></b><input type="range" id="fFpc" min="0" max="200" step="5" value="20"></label>
+    </div>
+    <div class="fin-out">
+      <div class="fbar"><span>Çözüm olmadan kayıp</span><i id="bBefore"></i><b id="oBefore"></b></div>
+      <div class="fbar"><span>Çözümle kalan kayıp</span><i id="bAfter" class="after"></i><b id="oAfter"></b></div>
+      <div class="fin-kpis">
+        <div><small>Önlenen kayıp</small><b id="oSaved"></b></div>
+        <div><small>Yanlış alarm maliyeti</small><b id="oFpCost"></b></div>
+        <div><small>Net fayda (toplam)</small><b id="oNet"></b></div>
+        <div><small>Bankanın net faydası</small><b id="oBankNet"></b></div>
+      </div>
+      <p class="tiny" id="oWhy"></p>
+    </div>
+  </div>
+  <p class="tiny reveal">Yakalama aralığı kendi ölçümlerimizden: %27 güçlü “tüm bakiye” sinyali olmadan PaySim, %60 orta nokta, %84 sentetik veride lojistik regresyon. Yanlış alarmlar çoğunlukla uygulama içi ek doğrulamadır, bu yüzden maliyeti düşüktür. HOLD para çıkmadan önce olduğu için geri alma maliyeti oluşmaz.</p>
+</section>
+
+<!-- 15 Özet -->
+<section id="ozet" data-title="Özet">
+  <div class="label reveal"><b>16</b> ÖZET</div>
+  <h2 class="reveal d1">Arayanı bilemeyiz, <em>davranışı</em> görürüz</h2>
+  <div class="grid g3">
+    <div class="card reveal d2"><h3>Vaka</h3><p class="sub">Sosyal mühendislikle para gönderme (APP fraud): doğru müşteri, doğru şifre, kandırılarak verilmiş onay. Klasik güvenlik kontrollerinin göremediği vaka.</p></div>
+    <div class="card reveal d3"><h3>Engelleme</h3><p class="sub">Tek tek masum sinyalleri birlikte okuyan risk skoru, üç seviyeli model, para çıkmadan HOLD, “Bankamı ara” ve katır hesap tespiti. Hepsi log, metrik ve alarmla izleniyor.</p></div>
+    <div class="card reveal d4"><h3>Vaka sonrası</h3><p class="sub">Hızlı tespit, etki analizi, katır dondurma, blameless postmortem ve gölge modda denenen yeni kurallarla sürekli iyileştirme.</p></div>
+  </div>
+  <p class="lead reveal d5" style="margin-top:36px">Sorular?</p>
+</section>
+</main>
+
+<script>
+(() => {
+  const sections = [...document.querySelectorAll("main section")];
+  const toc = document.getElementById("toc");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Menü
+  sections.forEach((s, i) => {
+    const a = document.createElement("a");
+    a.href = "#" + s.id;
+    a.innerHTML = `<span>${String(i).padStart(2, "0")}</span>${s.dataset.title}`;
+    a.onclick = e => { e.preventDefault(); go(i); };
+    toc.appendChild(a);
+  });
+  const links = [...toc.querySelectorAll("a")];
+  let current = 0;
+  const setActive = i => { current = i; links.forEach((l, j) => l.classList.toggle("active", i === j)); };
+
+  // Kaydırınca belirme + sayaç
+  const countUp = el => {
+    const target = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0), dur = 1100, t0 = performance.now();
+    const fmt = v => v.toFixed(dec).replace(".", ",");
+    if (reduce) return (el.textContent = fmt(target));
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(target * e);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const revealObs = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    en.target.classList.add("in");
+    en.target.querySelectorAll("[data-count]").forEach(c => { if (!c.dataset.done) { c.dataset.done = 1; countUp(c); } });
+    revealObs.unobserve(en.target);
+  }), { threshold: 0.15 });
+  document.querySelectorAll(".reveal").forEach(el => revealObs.observe(el));
+
+  const sectionObs = new IntersectionObserver(entries => entries.forEach(en => {
+    if (en.isIntersecting) setActive(sections.indexOf(en.target));
+  }), { rootMargin: "-45% 0px -50% 0px" });
+  sections.forEach(s => sectionObs.observe(s));
+
+  const progress = document.getElementById("progress");
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  };
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  // Saldırı zinciri
+  const chain = [
+    ["Temas", "Dolandırıcı banka güvenlik birimi adıyla arar. Numara gerçek gibi görünebilir, güven kurulur.", "Farkındalık kampanyası ve uygulamada “Beni arayan gerçekten banka mı?” doğrulaması."],
+    ["Baskı", "“Hesabınız tehlikede, hemen paranızı güvenli hesaba aktarın.” Düşünmeye zaman bırakılmaz.", "Uygulamada net uyarı: Banka sizden asla para aktarmanızı istemez."],
+    ["Havale", "Kurban kendi uygulamasından, kendi OTP'siyle gönderir. Sistem için meşru bir işlem.", "Risk skoru: yeni alıcı, yüksek tutar, aktif çağrı, uzaktan erişim. Skor ≥ 70 ise HOLD."],
+    ["Dağıtım", "Para katır hesaplara düşer, dakikalar içinde bölünüp nakde veya kriptoya çevrilir.", "Katır hesap alarmı (fan-in) ve hesabın dondurulması, karşı bankaya hızlı bildirim."],
+    ["Fark etme", "Kurban saatler sonra anlar. Para çoğunlukla geri alınamaz hale gelmiştir.", "Hızlı bildirim kanalı, etki analizi, blameless postmortem ve kural iyileştirme."],
+  ];
+  const chainEl = document.getElementById("chain"), atk = document.getElementById("chainAtk"), def = document.getElementById("chainDef");
+  chain.forEach(([nm], i) => {
+    const b = document.createElement("button");
+    b.className = "link"; b.type = "button";
+    b.innerHTML = `<div class="no">${String(i + 1).padStart(2, "0")}</div><div class="nm">${nm}</div>`;
+    b.onclick = () => showStep(i);
+    chainEl.appendChild(b);
+  });
+  let step = -1, timer = null;
+  function showStep(i) {
+    step = Math.max(-1, Math.min(i, chain.length - 1));
+    [...chainEl.children].forEach((c, j) => { c.classList.toggle("on", j === step); c.classList.toggle("done", j < step); });
+    if (step < 0) {
+      atk.innerHTML = `<h3>Saldırgan</h3><p class="sub">Başlamak için “Sonraki halka”ya basın.</p>`;
+      def.innerHTML = `<b>Savunma</b><p class="sub">Her halkada nerede durduğumuz burada görünecek.</p>`;
+      return;
+    }
+    const [nm, a, d] = chain[step];
+    atk.innerHTML = `<h3 class="fade">${step + 1}. ${nm}</h3><p class="sub fade">${a}</p>`;
+    def.innerHTML = `<b>Savunma burada</b><p class="fade" style="margin:0">${d}</p>`;
+  }
+  const stop = () => { clearInterval(timer); timer = null; document.getElementById("chainPlay").textContent = "▶ Saldırıyı akıt"; };
+  document.getElementById("chainNext").onclick = () => { stop(); showStep(step + 1); };
+  document.getElementById("chainReset").onclick = () => { stop(); showStep(-1); };
+  document.getElementById("chainPlay").onclick = e => {
+    if (timer) return stop();
+    if (step >= chain.length - 1) showStep(-1);
+    e.target.textContent = "❚❚ Durdur";
+    showStep(step + 1);
+    timer = setInterval(() => { step >= chain.length - 1 ? stop() : showStep(step + 1); }, 2200);
+  };
+  showStep(-1);
+
+  // Risk hesaplayıcı (demo/fraud_detection_demo.py ile aynı puanlar)
+  const signals = [["Yeni alıcı", 30, true], ["Yüksek tutar (≥ 20 bin TL)", 25, true], ["İşlem sırasında aktif çağrı", 25, false], ["Uzaktan erişim uygulaması", 20, false], ["Katır hesap sinyali", 30, false]];
+  const sigEl = document.getElementById("signals"), scoreEl = document.getElementById("score"), fill = document.getElementById("barFill"), verdict = document.getElementById("verdict");
+  let shown = 0;
+  signals.forEach(([nm, pt, on]) => {
+    const b = document.createElement("button");
+    b.className = "sig"; b.type = "button"; b.setAttribute("aria-pressed", on);
+    b.innerHTML = `<span>${nm}</span><span class="pt">+${pt}</span>`;
+    b.dataset.pt = pt;
+    b.onclick = () => { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); updateScore(); };
+    sigEl.appendChild(b);
+  });
+  function updateScore() {
+    const total = [...sigEl.children].filter(b => b.getAttribute("aria-pressed") === "true").reduce((s, b) => s + +b.dataset.pt, 0);
+    const hold = total >= 70;
+    fill.style.width = Math.min(total / 130, 1) * 100 + "%";
+    fill.style.background = hold ? "var(--red)" : total >= 40 ? "var(--gold)" : "var(--ok)";
+    verdict.className = "verdict" + (hold ? " hold" : "");
+    verdict.textContent = hold ? "HOLD: işlem bekletilir, ek doğrulama" : "Onay: işlem geçer";
+    const from = shown, t0 = performance.now();
+    const tick = now => { const p = reduce ? 1 : Math.min((now - t0) / 400, 1); scoreEl.textContent = Math.round(from + (total - from) * p); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick); shown = total;
+  }
+  updateScore();
+
+  // Seviyeler birlikte: karar tablosu senaryoları (phone-demo/data.js modellerinin çıktısı)
+  const SCEN = {
+    hold: { score: 80, lr: 1, gb: 1, hit: 1, why: "Kural skoru 80 (yeni alıcı + yüksek tutar + aktif çağrı): satır 1 tutar, model sonucuna bakılmadan HOLD." },
+    verify: { score: 55, lr: 1, gb: 1, hit: 2, why: "Arama yok, kural skoru 55: satır 1 tutmaz. Model tüm bakiyeyi riskli bulur, satır 2 ek doğrulama ister. Müşterinin cevabı satır 3'te kararı tamamlar." },
+    ok: { score: 0, lr: 0, gb: 0, hit: 4, why: "Kayıtlı alıcıya 2.500 TL: hiçbir satır tutmaz, satır 4 onay verir. Gölge model de aynı fikirde." },
+  };
+  const pc = v => "%" + Math.round(v * 100);
+  function showScen(k) {
+    const c = SCEN[k];
+    document.querySelectorAll("[data-scen]").forEach(b => b.classList.toggle("on", b.dataset.scen === k));
+    document.querySelectorAll("#dtp [data-row]").forEach(r => {
+      const n = r.dataset.row, v = r.querySelector(".v");
+      if (n === "G") { v.textContent = pc(c.gb); return; }
+      const i = +n;
+      r.className = i < c.hit ? "pass" : i === c.hit ? "hit" : (i === 3 && c.hit === 2) ? "next" : "skip";
+      v.textContent = i === 1 ? `skor ${c.score}` : i === 2 ? (c.hit >= 2 ? pc(c.lr) : "") : i === 3 ? (c.hit === 2 ? "2 soru sorulur" : "") : "";
+    });
+    document.getElementById("dtpWhy").textContent = c.why;
+  }
+  document.querySelectorAll("[data-scen]").forEach(b => b.onclick = () => showScen(b.dataset.scen));
+  showScen("hold");
+
+  // Finansal zarar hesabı (tüm girdiler varsayım)
+  const fv = id => +document.getElementById(id).value;
+  const mtl = v => "₺" + (v / 1e6).toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " milyon";
+  function finCalc() {
+    const cases = fv("fCases"), loss = fv("fLoss"), rec = fv("fRec") / 100, cat = fv("fCatch") / 100, bank = fv("fBank") / 100;
+    const vol = fv("fVol") * 1e6, fp = fv("fFp") / 1000, fpc = fv("fFpc");
+    const before = cases * loss * (1 - rec), saved = before * cat, after = before - saved, fpCost = vol * fp * fpc;
+    const set = (id, t) => document.getElementById(id).textContent = t;
+    set("vCases", cases.toLocaleString("tr-TR")); set("vLoss", "₺" + loss.toLocaleString("tr-TR")); set("vRec", "%" + fv("fRec"));
+    set("vCatch", "%" + fv("fCatch")); set("vBank", "%" + fv("fBank")); set("vVol", fv("fVol") + " milyon");
+    set("vFp", "%" + (fp * 100).toFixed(1).replace(".", ",")); set("vFpc", "₺" + fpc);
+    set("oBefore", mtl(before)); set("oAfter", mtl(after)); set("oSaved", mtl(saved)); set("oFpCost", mtl(fpCost));
+    set("oNet", mtl(saved - fpCost)); set("oBankNet", mtl(saved * bank - fpCost));
+    document.getElementById("bBefore").style.width = before ? "100%" : "0";
+    document.getElementById("bAfter").style.width = before ? (after / before * 100) + "%" : "0";
+    set("oWhy", `${cases.toLocaleString("tr-TR")} vaka × ₺${loss.toLocaleString("tr-TR")} × (1 − %${fv("fRec")} geri alınan) = ${mtl(before)}. `
+      + `Yakalanan %${fv("fCatch")} para çıkmadan durur. Yanlış alarm: ${(vol * fp).toLocaleString("tr-TR")} uygulama içi doğrulama × ₺${fpc}.`);
+  }
+  document.querySelectorAll(".fin-in input").forEach(i => i.oninput = () => { if (i.id === "fCatch") document.querySelectorAll("[data-fin]").forEach(b => b.classList.remove("on")); finCalc(); });
+  document.querySelectorAll("[data-fin]").forEach(b => b.onclick = () => {
+    document.getElementById("fCatch").value = b.dataset.fin;
+    document.querySelectorAll("[data-fin]").forEach(x => x.classList.toggle("on", x === b)); finCalc();
+  });
+  finCalc();
+
+  // Klavye: j/k bölüm, ←/→ zincir adımı (zincir bölümündeyken), PageUp/PageDown bölüm
+  // Aktif bölüm tuşa basıldığı anda ekranın ortasından hesaplanır; kaydırma sürerken hedef bölüm kullanılır
+  let navTarget = null, navTime = 0;
+  const here = () => {
+    if (navTarget !== null && performance.now() - navTime < 900) return navTarget;
+    const mid = innerHeight / 2;
+    const i = sections.findIndex(s => { const r = s.getBoundingClientRect(); return r.top <= mid && r.bottom > mid; });
+    return i < 0 ? current : i;
+  };
+  const go = i => {
+    navTarget = Math.max(0, Math.min(i, sections.length - 1)); navTime = performance.now();
+    sections[navTarget].scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+  };
+  addEventListener("keydown", e => {
+    if (e.target.closest?.("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key, i = here();
+    if (k === "j" || k === "PageDown") { e.preventDefault(); go(i + 1); }
+    else if (k === "k" || k === "PageUp") { e.preventDefault(); go(i - 1); }
+    else if (k === "ArrowRight" || k === "ArrowLeft") {
+      e.preventDefault();
+      if (sections[i].id === "zincir") { stop(); showStep(step + (k === "ArrowRight" ? 1 : -1)); }
+      else go(i + (k === "ArrowRight" ? 1 : -1));
+    }
+  });
+})();
+</script>
+</body>
+</html>
+

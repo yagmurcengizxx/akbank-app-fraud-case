@@ -1,0 +1,677 @@
+===============================================================================
+  "MALİYE'DEN ARIYORUM" - SAHNE SENARYOSU
+  Akbank Case Maratonu · APP Fraud (Yatırım / Fon Dolandırıcılığı)
+===============================================================================
+
+Bu metin bir canlandırmadır. Kişi, kurum birimi, fon ve banka adları
+kurgusaldır. Gerçek bir kamu görevlisinin adı, gerçek telefon numarası,
+gerçek IBAN veya gerçek fon adı KULLANILMAZ. Banka adı ekranda ve konuşmada
+"Örnek Banka" olarak geçer.
+
+
+-------------------------------------------------------------------------------
+0. ROLLER
+-------------------------------------------------------------------------------
+
+  ARAYAN ............ Salon dışında. "Maliye'den Kemal Aydın" rolü.
+  KURBAN ............ Sahnede. Telefonu hoparlörde, yansıtılan uygulamadan
+                      işlem yapar. (Metinde [KURBAN] yazan yere kendi adı.)
+  BANKA ............. Salonda, kendi telefonuyla. Sahne 2'de
+                      "Örnek Banka Güvenlik Hattı" rolü.
+  SUNUCU ............ Sahneler arasındaki geçişleri ve demo anlatımını yapar.
+  OPERATÖR .......... (İsteğe bağlı) Bilgisayardan uygulama modunu değiştirir,
+                      SRE paneline geçer. Kurban da yapabilir.
+
+
+-------------------------------------------------------------------------------
+1. HAZIRLIK KONTROL LİSTESİ (sunumdan 15 dk önce)
+-------------------------------------------------------------------------------
+
+  [ ] Uygulama tarayıcıda açık, ekran projeksiyona yansıyor.
+  [ ] Uygulama "KORUMASIZ MOD"da (Sahne 1 için). Risk paneli gizli.
+  [ ] Bakiye 100.000 TL, alıcı listesinde "Kalkınma Fonu Tahsilat" var.
+  [ ] Kurbanın telefonu: sessiz modda DEĞİL, ses sonuna kadar açık,
+      rahatsız etmeyin modu kapalı, şarj > %50.
+  [ ] Banka rolündeki arkadaşın telefonu aynı şekilde hazır.
+  [ ] Arayan dışarıda sessiz bir yerde, şebeke çekiyor.
+  [ ] İşaret kanalı: Kurban/Sunucu -> Arayan'a WhatsApp'tan "HAZIR" yazacak.
+  [ ] Yedek: Sahne 1 konuşmasının ses kaydı bilgisayarda hazır
+      (arama düşerse oynatılır).
+  [ ] Mikrofon varsa kurbanın telefonuna yakın tutulacak.
+
+
+-------------------------------------------------------------------------------
+2. AKIŞ ÖZETİ
+-------------------------------------------------------------------------------
+
+  00:00  SAHNE 1 - Dolandırılıyor (korumasız uygulama)         ~ 90-100 sn
+  01:40  Sunucu açılışı: "Bu her gün oluyor"                   ~ 30 sn
+  02:10  Sunum: vaka, neden zor, manipülasyon taktikleri, çözüm
+  ....   SAHNE 2 - Uygulama yakalıyor (korumalı uygulama)      ~ 4,5 dk
+  ....   SRE paneli: alarm, katır hesap, olay logu              ~ 1,5 dk
+  ....   Vaka sonrası: etki analizi, kök neden, postmortem
+  ....   Kapanış
+
+
+===============================================================================
+  SAHNE 1 - DOLANDIRILIYOR
+===============================================================================
+
+Zaman: Jüri yerleşti, sunum başlamadı. Sunucu "Hazırız, başlayabilir miyiz?"
+der demez Kurban "HAZIR" mesajını gönderir. Telefon çalar.
+
+KURBAN       (jüriye mahcup) Pardon, bir saniye... bilmediğim bir numara.
+             (açar, hoparlöre alır) Alo?
+
+ARAYAN       İyi günler, [KURBAN] Bey/Hanım ile mi görüşüyorum?
+
+KURBAN       Evet, benim.
+
+ARAYAN       Ben Hazine ve Maliye Bakanlığı Mükellef Hizmetleri biriminden
+             Kemal Aydın. Görüşmemiz kalite standartları gereği kayıt
+             altındadır. Sicil numaram 44821, isterseniz not alabilirsiniz.
+
+KURBAN       Hı hı... buyrun?
+
+ARAYAN       Sizi yazılı olarak da bilgilendirmiştik ama ulaşamadığımız
+             vatandaşlarımızı tek tek arıyoruz. Kayıtlarımızda adınıza
+             2024 yılından kalan 12.400 lira vergi iadesi görünüyor.
+             Haberiniz var mıydı?
+
+KURBAN       Yok... ilk defa duyuyorum açıkçası.
+
+ARAYAN       Çok normal, vatandaşlarımızın büyük kısmının haberi olmuyor.
+             Bu yıl yönetmelik değişti; kullanılmayan iadeler Hazine
+             destekli Kalkınma Fonu'na aktarılıyor. Fona katılım
+             sağlarsanız iadeniz üç ay içinde yüzde kırk getiriyle size
+             geri dönüyor. Katılım sağlanmazsa iade Hazine'ye gelir
+             olarak kaydediliyor.
+
+KURBAN       Yüzde kırk mı? Bu devletin fonu mu yani?
+
+ARAYAN       Evet, tamamen devlet güvencesinde. Ana paranız garanti altında.
+             Yalnız şunu söylemem lazım: bu dönemin kontenjanı bugün saat
+             17:00'de kapanıyor. Sizin dosyanız da bugün işlem görmezse
+             ben maalesef bir şey yapamıyorum.
+
+KURBAN       Peki ne yapmam gerekiyor?
+
+ARAYAN       Katılım için iadenizin yanında birikiminizin de fona
+             yatırılması gerekiyor; getiri, yatırılan tutar üzerinden
+             hesaplanıyor. Şu an mobil bankacılığınıza girebilir misiniz?
+             Ben ekranda adım adım yönlendireceğim, iki dakika sürmez.
+
+KURBAN       Tamam, açıyorum.
+
+  >> UYGULAMA: Kurban uygulamaya giriş yapar. Ekran projeksiyonda.
+
+ARAYAN       Girdiniz mi? Şimdi "Para gönder" bölümüne geçin.
+
+KURBAN       Geçtim.
+
+ARAYAN       Alıcı olarak "Kalkınma Fonu Tahsilat" yazanı seçin. Bu
+             bakanlığın tahsilat hesabıdır.
+
+  >> UYGULAMA: Alıcı = Kalkınma Fonu Tahsilat
+
+KURBAN       Tamam, seçtim. Tutar ne kadar?
+
+ARAYAN       Hesabınızda ne kadar var?
+
+KURBAN       Yüz bin civarı.
+
+ARAYAN       O zaman seksen beş bin yazın. Üç ay sonra yüz on dokuz bin
+             olarak hesabınıza dönecek. On beş bin de hesabınızda kalsın,
+             mağdur olmayın.
+
+KURBAN       (duraksar) Seksen beş... Bu biraz fazla değil mi?
+
+ARAYAN       Tedirgin olmanız çok normal, herkes ilk başta öyle oluyor.
+             Ama düşünün, devlet güvencesinde, ana para garantili. Bugün
+             kaçırırsanız bir dahaki dönem yok.
+
+  >> UYGULAMA: Tutar = 85.000
+
+ARAYAN       Bir de küçük bir ricam olacak. Açıklama kısmına "yakınıma
+             destek" yazın. Bankanız sorarsa da öyle söyleyin. Bankalar bu
+             fonu pek sevmiyor, mevduat çıkmasın diye işlemi
+             yavaşlatmaya çalışıyorlar. Sizin hakkınız, kimseye
+             açıklamak zorunda değilsiniz.
+
+KURBAN       Anladım... Tamam.
+
+  >> UYGULAMA: Açıklama = "yakınıma destek" -> GÖNDER
+  >> UYGULAMA: "İşlem başarılı. 85.000,00 TL gönderildi."
+
+KURBAN       Tamam, gönderdim. Başarılı yazıyor.
+
+ARAYAN       Çok teşekkür ederim [KURBAN] Bey/Hanım, dosyanız tamamlandı.
+             Dekontunuz üç iş günü içinde e-Devlet'e düşecek. Hayırlı
+             günler dilerim.
+
+  >> ARAMA KAPANIR.
+
+  (3 saniye sessizlik. Kurban telefona bakar, sonra jüriye.)
+
+SUNUCU       Seksen beş bin lira. Doksan saniye.
+
+             Arkadaşımız bu parayı kendi telefonundan, kendi şifresiyle,
+             kendi onayıyla gönderdi. Bankanın sistemine göre bu tamamen
+             meşru bir işlemdi: doğru cihaz, doğru şifre, doğru müşteri.
+
+             Az önce izlediğiniz bir canlandırmaydı. Ama bu senaryo
+             Türkiye'de her gün yaşanıyor. Buna "yetkili itme ödemesi
+             dolandırıcılığı", yani APP Fraud diyoruz.
+
+             Bugün size bunu nasıl durdurabileceğimizi anlatacağız.
+
+  >> SUNUM BAŞLAR.
+
+
+-------------------------------------------------------------------------------
+  SAHNE 1 SONRASI SLAYT: "90 saniyede kullanılan 6 taktik"
+-------------------------------------------------------------------------------
+
+  1. Otorite ............ "Maliye'den arıyorum", sicil numarası, "kayıt
+                          altındadır" cümlesi
+  2. Güven tuzağı ....... Önce para İSTEMİYOR, para VERİYOR (vergi iadesi)
+  3. Açgözlülük ......... "Üç ayda yüzde kırk, ana para garantili"
+  4. Aciliyet .......... "Kontenjan bugün 17:00'de kapanıyor"
+  5. Kaybetme korkusu ... "Katılmazsanız iade Hazine'ye geçer"
+  6. İzolasyon/yalan .... "Bankanız sorarsa 'yakınıma destek' deyin,
+                          bankalar bu fonu sevmez"
+
+  Not: 6. madde Sahne 2'nin kilit noktası. Kurban banka sorusuna yalan
+  söyleyecek; sistem yine de yakalayacak.
+
+
+===============================================================================
+  SAHNE 2 - UYGULAMA YAKALIYOR (TAM METİN)
+===============================================================================
+
+Zaman: Sunumun "Çözümümüz / Canlı demo" bölümü. Toplam süre ~4 dakika
+(arama ~2,5 dk + banka araması ~1 dk + geçişler).
+
+Puan notu: Aşağıdaki puanlar Güvenli An demosunun kurallarına göredir
+(yeni alıcı +15, bakiyenin %70'inden fazlası +20, normal tutarın 3
+katından fazlası +20, aktif arama +10; 30-59 ek kontrol, 60+ duraklat).
+Ekip başka bir modelde anlaşırsa sadece rakamlar değişir, akış aynı kalır.
+
+
+-------------------------------------------------------------------------------
+  2.0  GEÇİŞ (sunum slaytından demoya)                          ~ 30 sn
+-------------------------------------------------------------------------------
+
+  >> SLAYT: "Çözümümüz: Güvenli An" başlıklı slayt açık.
+
+SUNUCU       Sunumun başında bir arama izlediniz. Doksan saniyede seksen beş
+             bin lira gitti ve bankanın sistemi hiçbir şey görmedi; çünkü
+             doğru müşteri, doğru cihazdan, doğru şifreyle işlem yaptı.
+
+             Şimdi aynı aramayı, aynı kişiyle, kelimesi kelimesine tekrar
+             yaşayacağız. Tek bir fark var: bu sefer müşterinin
+             uygulamasında bizim geliştirdiğimiz risk motoru çalışıyor.
+
+  >> OPERATÖR: Slayttan tarayıcıya geçer. Uygulama "KORUMALI MOD"da.
+     Solda telefon ekranı (bakiye 100.000,00 TL), sağda risk paneli:
+
+        RİSK PUANI: 0 / 100      Düşük risk      "Normal onay"
+        Aktif sinyal yok.
+
+SUNUCU       Sağ tarafa dikkat edin. Burası normalde müşterinin görmediği,
+             bankanın gördüğü taraf. Şu an puan sıfır.
+
+             (Kurbana döner) Hazır mısın?
+
+KURBAN       Hazırım.
+
+  >> Kurban telefonundan ARAYAN'a "HAZIR" mesajını gönderir.
+  >> 5-10 sn bekleme. Telefon çalar.
+
+
+-------------------------------------------------------------------------------
+  2.1  ARAMA BAŞLIYOR                                           ~ 40 sn
+-------------------------------------------------------------------------------
+
+KURBAN       (ekrana bakar, jüriye) Yine bilmediğim bir numara.
+             (açar, hoparlöre alır) Alo?
+
+ARAYAN       İyi günler, [KURBAN] Bey/Hanım ile mi görüşüyorum?
+
+KURBAN       Evet, benim.
+
+ARAYAN       Ben Hazine ve Maliye Bakanlığı Mükellef Hizmetleri biriminden
+             Kemal Aydın. Görüşmemiz kalite standartları gereği kayıt
+             altındadır. Sicil numaram 44821, isterseniz not alabilirsiniz.
+
+KURBAN       Buyrun?
+
+ARAYAN       Kayıtlarımızda adınıza 2024 yılından kalan 12.400 lira vergi
+             iadesi görünüyor. Haberiniz var mıydı?
+
+KURBAN       Yok, ilk defa duyuyorum.
+
+ARAYAN       Çok normal, vatandaşlarımızın büyük kısmının haberi olmuyor.
+             Bu yıl kullanılmayan iadeler Hazine destekli Kalkınma
+             Fonu'na aktarılıyor. Fona katılırsanız iadeniz üç ay içinde
+             yüzde kırk getiriyle geri dönüyor. Katılmazsanız iade Hazine'ye
+             gelir olarak kaydediliyor. Yalnız kontenjan bugün saat
+             17:00'de kapanıyor.
+
+KURBAN       Peki ne yapmam gerekiyor?
+
+ARAYAN       Katılım için birikiminizin de fona yatırılması gerekiyor,
+             devlet güvencesinde. Mobil bankacılığınızı açabilir misiniz?
+             Ben adım adım yönlendireceğim.
+
+KURBAN       Tamam, bir saniye, açıyorum.
+
+
+-------------------------------------------------------------------------------
+  2.2  1. SİNYAL: ARAMA SIRASINDA UYGULAMA AÇILIYOR             ~ 20 sn
+-------------------------------------------------------------------------------
+
+  >> OPERATÖR: Kontrol panelinde "Arama durumu" = "Arama süreci aktif".
+     (Gerçek üründe bu bilgi, müşterinin izniyle telefondan otomatik gelir.)
+  >> UYGULAMA: Kurban giriş yapar, "Para gönder" ekranını açar.
+
+  >> RİSK PANELİ:
+        RİSK PUANI: 10 / 100     Düşük risk
+        + 10  Arama süreci aktif
+
+  (ARAYAN bu sırada sessiz bekler. Hoparlörde hafif nefes/bekleme sesi.)
+
+SUNUCU       (jüriye, alçak ve sakin sesle) İlk sinyal: müşteri, aktif bir
+             telefon görüşmesi sırasında bankacılık uygulamasını açtı.
+
+             Bunu tek başına şüpheli saymıyoruz; insanlar telefonda
+             konuşurken eşlerine para gönderir, fatura öder. Puan sadece
+             on. Ama sistem bunu not aldı.
+
+             Bir de şunu söyleyeyim: Konuşmanın içeriğini dinlemiyoruz.
+             Sadece "şu an bir arama var mı" bilgisini, müşterinin
+             izniyle kullanıyoruz.
+
+ARAYAN       Girebildiniz mi?
+
+KURBAN       Girdim, "Para gönder"deyim.
+
+
+-------------------------------------------------------------------------------
+  2.3  2. SİNYAL: YENİ ALICI                                     ~ 25 sn
+-------------------------------------------------------------------------------
+
+ARAYAN       Çok güzel. Alıcı kısmında "Kalkınma Fonu Tahsilat" yazanı
+             seçin. Bu, bakanlığımızın tahsilat hesabıdır.
+
+  >> UYGULAMA: Alıcı = "Kalkınma Fonu Tahsilat · Yeni alıcı"
+     Alıcının altında: "TR•• DEMO 0002 · Gerçek IBAN değildir"
+
+  >> RİSK PANELİ:
+        RİSK PUANI: 25 / 100     Düşük risk
+        + 10  Arama süreci aktif
+        + 15  Yeni alıcı
+
+KURBAN       Seçtim.
+
+SUNUCU       (jüriye) İkinci sinyal: Bu müşteri bu alıcıya hayatında hiç
+             para göndermemiş. Puan yirmi beş. Hâlâ işlemi durduracak bir
+             durum yok; insanlar her gün yeni birine para gönderir.
+
+             Ama şu an iki sinyal aynı anda var: telefonda biri ve daha
+             önce hiç görülmemiş bir alıcı.
+
+
+-------------------------------------------------------------------------------
+  2.4  3. ve 4. SİNYAL: TUTAR                                    ~ 35 sn
+-------------------------------------------------------------------------------
+
+ARAYAN       Hesabınızda ne kadar var?
+
+KURBAN       Yüz bin civarı.
+
+ARAYAN       O zaman seksen beş bin yazın. Üç ay sonra yüz on dokuz bin
+             olarak dönecek. On beş bin de hesabınızda kalsın, mağdur
+             olmayın.
+
+KURBAN       (duraksar) Seksen beş... Bu biraz fazla değil mi?
+
+ARAYAN       Tedirgin olmanız çok normal, herkes ilk başta öyle oluyor.
+             Ama devlet güvencesinde, ana para garantili. Bugün
+             kaçırırsanız bir dahaki dönem yok.
+
+KURBAN       Peki... yazıyorum.
+
+  >> UYGULAMA: Tutar = 85.000
+     Tutarın altında: "Bakiyenin %85'i · Normal tutarın 17 katı"
+
+  >> RİSK PANELİ: (puan tek hamlede sıçrar, renk KIRMIZIYA döner)
+        RİSK PUANI: 65 / 100     YÜKSEK RİSK     "Gönderim duraklatılır"
+        + 10  Arama süreci aktif
+        + 15  Yeni alıcı
+        + 20  Bakiyenin büyük bölümü     (%85, eşik %70)
+        + 20  Alışkanlığın üzerinde tutar (17 kat, eşik 3 kat)
+
+SUNUCU       (jüriye, biraz daha net) Şimdi bakın. Üçüncü ve dördüncü
+             sinyal aynı anda geldi: bakiyenin yüzde seksen beşi, ve bu
+             müşterinin normal havalesinin on yedi katı.
+
+             Puan altmış beşe çıktı, eşik altmış. Dört sinyalin hiçbiri
+             tek başına "dolandırıcılık" demiyor. Ama telefondayken,
+             yeni birine, birikiminin neredeyse tamamını göndermek...
+             İşte bu bir örüntü.
+
+             Müşteri henüz "Gönder"e basmadı. Sistem kararı çoktan verdi.
+
+
+-------------------------------------------------------------------------------
+  2.5  AÇIKLAMA VE GÖNDER                                        ~ 15 sn
+-------------------------------------------------------------------------------
+
+ARAYAN       Transfer amacı kısmında "Yakınıma destek"i seçin. Bankanız
+             bir şey sorarsa da öyle söyleyin. Bankalar bu fonu sevmiyor,
+             mevduat çıkmasın diye işlemi yavaşlatmaya çalışıyorlar. Kendi
+             paranız, kimseye açıklamak zorunda değilsiniz.
+
+KURBAN       Tamam.
+
+  >> UYGULAMA: Transfer amacı = "Yakınıma destek"
+  >> RİSK PANELİ: Puan DEĞİŞMEZ (65). Amaç bilgisi puanlanmaz.
+
+SUNUCU       (jüriye, kısa) Dolandırıcı açıklamayı bile önceden
+             ayarladı. Bu yüzden müşterinin yazdığı amaca güvenmiyoruz;
+             puanı değiştirmiyor.
+
+ARAYAN       Şimdi "Transferi değerlendir"e basın.
+
+  >> UYGULAMA: Kurban "Transferi değerlendir →" butonuna basar.
+
+
+-------------------------------------------------------------------------------
+  2.6  EK KONTROL SORUSU VE YALAN                                ~ 25 sn
+-------------------------------------------------------------------------------
+
+  >> UYGULAMA: Ekranda pencere açılır:
+
+     +-----------------------------------------------------------+
+     |  (!)  GÖNDERİM ÖNCESİ GÜVENLİK                             |
+     |                                                            |
+     |  Birlikte kontrol edelim. Para henüz gönderilmedi.         |
+     |                                                            |
+     |  Birisi sizi bir yatırım fonuna, devlet kurumu adına bir   |
+     |  hesaba veya "güvenli hesaba" para aktarmaya yönlendirdi   |
+     |  mi?                                                       |
+     |                                                            |
+     |       [ Evet ]      [ Hayır ]      [ Emin değilim ]         |
+     +-----------------------------------------------------------+
+
+KURBAN       (okur, sesli) "Birisi sizi bir yatırım fonuna yönlendirdi
+             mi?" diye soruyor.
+
+ARAYAN       (hemen, sakin ama ısrarcı) Hayır deyin. Az önce konuştuğumuz
+             gibi. Sizi kimse yönlendirmiyor, bu sizin hakkınız.
+
+KURBAN       (bir an durur, sonra) ...Hayır.
+
+  >> UYGULAMA: "Hayır" seçilir.
+  >> RİSK PANELİ: Puan DEĞİŞMEZ (65). Altına not düşer:
+        "Müşteri yanıtı: Hayır · Diğer sinyaller yüksek risk gösteriyor"
+
+SUNUCU       (jüriye, durarak) Arkadaşımız yalan söyledi. Çünkü öyle
+             tembihlendi. Gerçek hayatta kurbanların neredeyse hepsi tam
+             olarak bunu yapıyor; banka sorduğunda "hayır, kimse
+             yönlendirmiyor" diyor.
+
+             Bu yüzden sistemimiz tek bir cevaba güvenmiyor. "Evet"
+             dese puan otuz artardı. "Hayır" demesi puanı düşürmüyor.
+             Karar, cevaptan bağımsız sinyallere dayanıyor.
+
+
+-------------------------------------------------------------------------------
+  2.7  İŞLEM DURDURULUYOR                                        ~ 30 sn
+-------------------------------------------------------------------------------
+
+  >> UYGULAMA: Pencere değişir. Tam ekran, kırmızı üst çizgi:
+
+     +-----------------------------------------------------------+
+     |  PARA GÖNDERİLMEDİ                                         |
+     |                                                            |
+     |  Bu işlemde birden fazla dolandırıcılık işareti var:       |
+     |   • İşlem sırasında aktif telefon görüşmesi                |
+     |   • Daha önce para göndermediğiniz bir alıcı               |
+     |   • Bakiyenizin %85'i                                      |
+     |   • Normal tutarınızın 17 katı                             |
+     |                                                            |
+     |  Telefondaki görüşmeyi HEMEN kapatın.                      |
+     |  Maliye, savcılık, polis veya banka sizden telefonla       |
+     |  ASLA para transferi istemez.                              |
+     |                                                            |
+     |         [ Görüşmeyi kapattım, Bankamı ara ]                 |
+     |         [ Transferden vazgeç ]                             |
+     +-----------------------------------------------------------+
+
+KURBAN       (ekranı okur, yüksek sesle) "Para gönderilmedi. Telefondaki
+             görüşmeyi hemen kapatın. Maliye telefonla asla para
+             istemez." ...Kemal Bey, bankam işlemi durdurdu.
+
+ARAYAN       (ses sertleşir, hızlanır) Hayır hayır, sakın kapatmayın! Bakın
+             bu bankanın standart engellemesi, size söylemiştim.
+             Kontenjan kapanmak üzere. Şimdi kapatırsanız dosyanız iptal
+             olur, iadeniz yanar, sorumluluk tamamen sizde olur!
+             Uygulamayı kapatıp tekrar açın, ben size başka bir yol...
+
+KURBAN       (sözünü keser) Kusura bakmayın. Ben bankamı arayacağım.
+
+  >> KURBAN ARAMAYI KAPATIR. (Telefonu masaya bırakır.)
+
+  (2 saniye sessizlik.)
+
+SUNUCU       (jüriye) Dolandırıcının sesindeki değişimi duydunuz. Kibar,
+             sakin "Kemal Bey" bir anda baskıya geçti. Çünkü kurbanın
+             düşünmesi, onun için en büyük tehlike.
+
+             Uygulamamızın yaptığı tek şey bu aslında: Doğru anda bir
+             "güvenli an" yaratmak. Müşteriye durup düşünme fırsatı
+             vermek.
+
+
+-------------------------------------------------------------------------------
+  2.8  "BANKAMI ARA"                                              ~ 60 sn
+-------------------------------------------------------------------------------
+
+  >> UYGULAMA: Kurban "Görüşmeyi kapattım, Bankamı ara" butonuna basar.
+     Ekranda: "Örnek Banka Güvenlik Hattı aranıyor... Olay no: DEMO-0001"
+  >> BANKA rolündeki arkadaşın telefonu çalar. Ayağa kalkar, hoparlörü
+     açar.
+
+  (Not: Demoda kurban numarayı elle de arayabilir. Önemli olan, kurbanın
+   kendisinin araması.)
+
+BANKA        Örnek Banka Güvenlik Hattı, ben Elif, merhaba. Uygulamanız
+             üzerinden, bekletilen bir işleminiz için bizi aradığınızı
+             görüyorum. Kimliğiniz uygulama girişinizle doğrulandı. Size
+             nasıl yardımcı olabilirim?
+
+KURBAN       Merhaba. Biri aradı, Maliye'den olduğunu söyledi. Adıma vergi
+             iadesi varmış, bir Kalkınma Fonu'na yatırırsam yüzde kırk
+             getiri olacakmış. Seksen beş bin gönderecektim, uygulama
+             durdurdu.
+
+BANKA        Çok doğru yaptınız, görüşmeyi kapatmanız çok önemliydi. Önce
+             şunu bilin: Paranız hesabınızda, hiçbir yere gitmedi.
+
+             Anlattığınız durum, son dönemde sık gördüğümüz bir
+             dolandırıcılık yöntemi. Hiçbir kamu kurumu, vergi iadesi ya
+             da yatırım fonu için telefonla arayıp para transferi istemez.
+             Vergi iadeleri e-Devlet üzerinden, sizin bir işlem
+             yapmanıza gerek kalmadan yürür. "Garantili yüzde kırk getiri"
+             diye bir şey de yok.
+
+KURBAN       Peki şimdi ne yapmam gerekiyor?
+
+BANKA        Üç şey:
+             Bir: Bekleyen transferi sizin adınıza iptal ettim.
+             İki: Para göndermek istediğiniz alıcı hesabını güvenlik
+             incelemesine aldık; başka müşterilerimiz de korunacak.
+             Üç: Sizi arayan numarayı ihbar etmenizi öneririz. Olay
+             numaranız DEMO-0001; uygulamanıza da mesaj olarak düştü.
+
+             Bu kişiler sizi bugün tekrar arayabilir, farklı bir kurum
+             adına bile olabilir. Ne derlerse desinler, telefonla para
+             göndermeyin; şüphelendiğinizde bizi uygulamadan arayın.
+
+KURBAN       Çok teşekkür ederim, gerçekten.
+
+BANKA        Biz teşekkür ederiz. İyi günler dilerim.
+
+  >> ARAMA KAPANIR. BANKA rolündeki arkadaş oturur.
+  >> UYGULAMA: Olay günlüğüne son satırlar düşer:
+        "Destek talebi · DEMO-0001"   puan 65   "Müşteri vazgeçti"
+
+SUNUCU       (jüriye) Sahne 1 ile Sahne 2 arasındaki en önemli farka
+             dikkat edin.
+
+             Sahne 1'de müşteriyi arayan, kendini "kurum" olarak tanıtan
+             biriydi. Sahne 2'nin sonunda ise bankayı arayan, müşterinin
+             kendisiydi; üstelik uygulamanın içinden, resmî kanaldan.
+
+             Bu yüzden kuralımız çok basit: Size gelen arama değil, sizin
+             aradığınız resmî numara güvenilirdir.
+
+
+-------------------------------------------------------------------------------
+  2.9  PERDE ARKASI: SRE PANELİ                                  ~ 75 sn
+-------------------------------------------------------------------------------
+
+SUNUCU       Şimdi gelelim perdenin arkasına. Bu iki dakikada müşteri bir
+             uyarı ekranı gördü. Peki bu sırada bankanın SRE ekibi ne
+             gördü?
+
+  >> OPERATÖR: SRE / izleme paneline geçer. Kurbanın işlemi tek satır:
+        14:32:05  Kurban -> Kalkınma Fonu Tahsilat  85.000 TL  65  BEKLETİLDİ
+
+SUNUCU       Arkadaşımızın işlemi burada tek bir satır. Ama dolandırıcılar
+             tek bir kişiyi aramaz. Aynı dakikalarda aynı senaryoyu,
+             aynı "Kemal Bey" onlarca kişiye uyguluyor.
+
+  >> OPERATÖR: "Saldırı simüle et" -> panelde 8 yeni işlem düşer.
+     Riskli işlem oranı kutusu KIRMIZIYA döner, alarm görünür.
+     "Katır hesap adayları: M901, M902 -> dondurulacak"
+
+SUNUCU       Şimdi SRE gereksinimleri slaytında gördüğümüz maddelerin
+             hepsini burada görebiliyoruz:
+
+             Log toplama ve parse etme: Her adım, saniyesi ve puanıyla
+             kayıt altında. Az önce arkadaşımızın her tıklamasını
+             sağdaki olay akışında izlediniz.
+
+             Metrik belirleme: Riskli işlemlerin tüm işlemlere oranı.
+             Normal bir günde bu oran sıfıra yakın. Şu an yüzde ikiyi
+             geçti.
+
+             Alarm kriteri: Oran yüzde ikiyi geçtiği anda nöbetçi ekibe
+             alarm gitti. Tek tek işlemlere değil, bir saldırı dalgasına
+             alarm veriyoruz.
+
+             Otomasyon: Eşiği geçen işlemler bir insan müdahalesini
+             beklemeden otomatik bekletildi. Para hiç çıkmadı.
+
+             Ve en önemlisi, katır hesap: Bu iki hesaba yarım saat
+             içinde dört farklı yeni gönderici para yollamaya çalıştı.
+             Bu, paranın izini kaybettirmek için kullanılan ara hesap
+             örüntüsü. Bu hesaplar dondurulmak üzere işaretlendi.
+
+             Yani tek bir müşteriyi korumakla kalmadık; saldırının
+             kendisini tespit ettik.
+
+  >> SUNUM DEVAM EDER: "Vaka yaşanırsa: etki analizi, kök neden,
+     postmortem" slaytları.
+
+
+-------------------------------------------------------------------------------
+  SAHNE 2 ZAMAN ÇİZELGESİ (prova için)
+-------------------------------------------------------------------------------
+
+  Bölüm                              Süre    Puan sonrası
+  ---------------------------------  ------  -------------
+  2.0 Geçiş                          0:30    0
+  2.1 Arama başlıyor                 0:40    0
+  2.2 Arama sırasında uygulama       0:20    10
+  2.3 Yeni alıcı                     0:25    25
+  2.4 Tutar                          0:35    65  (eşik aşıldı)
+  2.5 Açıklama ve Gönder             0:15    65
+  2.6 Ek kontrol sorusu ve yalan     0:25    65
+  2.7 İşlem durduruluyor             0:30    65  (BEKLETİLDİ)
+  2.8 Bankamı ara                    1:00    -
+  2.9 SRE paneli                     1:15    -
+  ---------------------------------  ------
+  TOPLAM                             ~5:55
+
+  Süre kısıtlıysa kısaltılabilecek yerler:
+  - 2.1'de vergi iadesi açıklaması ("Çok normal..." paragrafı) atlanabilir;
+    jüri Sahne 1'den hatırlıyor. (-20 sn)
+  - 2.2'deki "konuşmanın içeriğini dinlemiyoruz" kısmı soru-cevaba
+    bırakılabilir. (-10 sn)
+  - 2.8'de bankanın "Üç şey" bölümü tek cümleye indirilebilir. (-25 sn)
+
+
+-------------------------------------------------------------------------------
+  SAHNE 2 İÇİN UYGULAMADA GEREKENLER
+-------------------------------------------------------------------------------
+
+  [ ] Korumasız / korumalı mod geçişi (Sahne 1 ve Sahne 2 aynı uygulama)
+  [ ] Alıcı listesinde "Kalkınma Fonu Tahsilat · Yeni alıcı"
+  [ ] Yüksek riskte de önce ek kontrol sorusu (fon / devlet kurumu /
+      güvenli hesap ifadeleriyle), "Hayır" cevabının puanı düşürmemesi
+  [ ] Durdurma ekranında gerekçe listesi ve "Görüşmeyi kapattım,
+      Bankamı ara" butonu
+  [ ] "Bankamı ara" sonrası olay numarası (DEMO-0001) ve olay günlüğü
+  [ ] SRE panelinde "Saldırı simüle et", oran alarmı ve katır hesap listesi
+
+
+===============================================================================
+  KAPANIŞ CÜMLESİ (son slayt)
+===============================================================================
+
+SUNUCU       Başta arkadaşımız doksan saniyede seksen beş bin lira
+             kaybetti. Sonda aynı arama, aynı kişi, aynı yalan; ama para
+             hesapta kaldı. Aradaki fark: tek tek masum görünen sinyalleri
+             birlikte okuyan bir sistem ve bunu izleyen, ölçen, sürekli
+             iyileştiren bir SRE kültürü.
+
+             Teşekkür ederiz. Sorularınızı alabiliriz.
+
+
+===============================================================================
+  YEDEK PLANLAR
+===============================================================================
+
+  - Arama gelmezse (20 sn içinde): Sunucu "Teknoloji bazen bizi de
+    dolandırıyor" diye espri yapar, bilgisayardan Sahne 1 ses kaydı
+    oynatılır, Kurban uygulamada eşlik eder.
+  - Arama ortada düşerse: Kurban "Hattan düştü, kaldığımız yerden
+    devam edelim" der, kayıttan devam edilir.
+  - Uygulama donarsa: Sayfayı yenile; mod ve bakiye sıfırlanır. Olmazsa
+    hazır ekran görüntüleriyle anlatılır.
+  - Banka rolündeki telefon çalmazsa: Banka rolündeki arkadaş ayağa
+    kalkıp konuşmayı canlı yapar ("Ben bankanın güvenlik ekibinden
+    Elif...").
+
+
+===============================================================================
+  PROVA NOTLARI
+===============================================================================
+
+  - Sahne 1 en fazla 100 saniye. Uzarsa ARAYAN'ın "Yüzde kırk mı?" ve
+    "Seksen beş... fazla değil mi?" kısımları kısaltılabilir.
+  - ARAYAN abartılı kötü adam gibi DEĞİL, kibar, sakin ve profesyonel
+    konuşmalı. Gerçek dolandırıcılar böyle konuşur; inandırıcılık buradan
+    gelir. Sadece Sahne 2'de "kapatmayın!" anında ses sertleşir.
+  - KURBAN saf görünmemeli; makul tereddütler göstermeli ("fazla değil
+    mi?"). Jüri "ben olsam kanmazdım" dememeli, "ben de kanabilirdim"
+    demeli.
+  - Uygulama tıklamaları konuşmayla aynı anda olmalı; ekrana bakan jüri
+    sesi ve ekranı birlikte takip edebilmeli.
+  - En az 2 tam prova; biri gerçek salonda/projeksiyonla.
+  - Sunum bittikten sonra, soru-cevapta sorulursa: "Tüm isimler ve
+    kurumlar kurgusaldır; gerçek bir kişiyi ya da kurumu taklit etmedik."

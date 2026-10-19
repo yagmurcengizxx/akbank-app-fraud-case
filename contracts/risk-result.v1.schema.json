@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RiskEvaluationResult v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "ruleVersion",
+    "score",
+    "decision",
+    "reasonCodes",
+    "simulation"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "ruleVersion": {
+      "const": "v1"
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 130
+    },
+    "decision": {
+      "enum": [
+        "ALLOW",
+        "HOLD"
+      ]
+    },
+    "reasonCodes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "NEW_BENEFICIARY",
+          "HIGH_AMOUNT",
+          "ACTIVE_CALL",
+          "REMOTE_ACCESS",
+          "MULE_FAN_IN"
+        ]
+      }
+    },
+    "simulation": {
+      "const": true
+    }
+  }
+}
